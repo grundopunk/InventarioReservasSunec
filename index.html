@@ -32,6 +32,9 @@ body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:var(-
 .inv-params .k { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
 .inv-params .v { font-size: var(--cds-font-size-heading); font-weight: var(--cds-font-weight-medium); font-variant-numeric: tabular-nums; }
 .inv-table.txt2 th:nth-child(2), .inv-table.txt2 td:nth-child(2) { text-align: left; }
+.inv-footer { background: #032D45; color: #ffffff; border-radius: var(--cds-radius); padding: var(--cds-pad-md) var(--cds-pad-lg); display: flex; justify-content: space-between; align-items: center; gap: var(--cds-gap-md); flex-wrap: wrap; font-size: var(--cds-font-size-caption); border-top: 3px solid #B09A3B; }
+.inv .inv-footer b { color: #ffffff; font-weight: var(--cds-font-weight-medium); }
+.inv-footer span:last-child { color: #D9C98A; letter-spacing: .08em; }
 </style>
 <script>
 (function(){
@@ -330,6 +333,10 @@ Scarlet,4,Potencial,4,0.5,7188.37,1.5484,0.3975`;
 
   <p class="inv-foot">Onzas contenidas in situ, sin aplicar recuperación metalúrgica. Bajo JORC y NI 43-101 el recurso inferido no se suma a las reservas; aquí se muestra por separado y en el total del inventario de minado.</p>
   </section>
+  <footer class="inv-footer">
+    <span>Developed by <b>Henry Contreras</b></span>
+    <span>Consorcio Minero SUNEC</span>
+  </footer>
 </div>
 
 <script>
