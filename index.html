@@ -1,11 +1,11 @@
 <!doctype html>
 <html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Inventario de reservas</title>
+<title>Inventario de recursos y reservas</title>
 <meta name="description" content="Inventario de reservas por categoría: Probado, Probable e Inferido operacional. Consorcio Minero SUNEC.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Consorcio Minero SUNEC">
-<meta property="og:title" content="Inventario de reservas – Consorcio Minero SUNEC">
-<meta property="og:description" content="Tonelaje, ley Au, onzas contenidas y anchos por categoría.">
+<meta property="og:title" content="Inventario de recursos y reservas – Consorcio Minero SUNEC">
+<meta property="og:description" content="Recurso y reservas: tonelaje, ley Au, onzas contenidas y anchos por categoría y veta.">
 <meta property="og:url" content="https://grundopunk.github.io/InventarioReservasSunec/">
 <meta property="og:image" content="https://grundopunk.github.io/InventarioReservasSunec/og-image.png">
 <meta property="og:image:secure_url" content="https://grundopunk.github.io/InventarioReservasSunec/og-image.png">
@@ -31,6 +31,7 @@ body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:var(-
 .inv-params > div { background: var(--color-panel); padding: var(--cds-pad-sm) var(--cds-pad-md); display: flex; flex-direction: column; gap: 2px; }
 .inv-params .k { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
 .inv-params .v { font-size: var(--cds-font-size-heading); font-weight: var(--cds-font-weight-medium); font-variant-numeric: tabular-nums; }
+.inv-table.txt2 th:nth-child(2), .inv-table.txt2 td:nth-child(2) { text-align: left; }
 </style>
 <script>
 (function(){
@@ -38,7 +39,24 @@ body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:var(-
 1,Probado,35679,5.38,0.55,1.28
 2,Probable,72281,5.40,0.52,1.10
 3,Inferido operacional,59691,5.18,0.47,0.99`;
-  const store={inventario:d3.csvParse(csv)}, draws=[], ons=[];
+  const rec=`veta,orden_veta,categoria,orden_cat,cutoff,toneladas,ley_au,ancho
+Pierina Piso,1,Medido,1,0.5,36233.5,5.1681,0.38
+Pierina Piso,1,Indicado,2,0.5,44326.16,4.154,0.3
+Pierina Piso,1,Inferido,3,0.5,43383.24,3.3844,0.33
+Pierina Piso,1,Potencial,4,0.5,31108.81,2.0419,0.44
+Pierina Centro,2,Medido,1,0.5,35131.11,6.6312,0.41
+Pierina Centro,2,Indicado,2,0.5,52418.26,4.2246,0.42
+Pierina Centro,2,Inferido,3,0.5,56929.92,2.8619,0.48
+Pierina Centro,2,Potencial,4,0.5,42401.75,3.0364,0.59
+Pierina Techo,3,Medido,1,0.5,5490.22,5.5959,0.65
+Pierina Techo,3,Indicado,2,0.5,3755.6,3.4522,0.57
+Pierina Techo,3,Inferido,3,0.5,2456.86,4.1471,0.45
+Pierina Techo,3,Potencial,4,0.5,945.48,5.2716,0.46
+Scarlet,4,Medido,1,0.5,3650.37,2.8624,0.6613
+Scarlet,4,Indicado,2,0.5,3075.4,2.0854,0.4568
+Scarlet,4,Inferido,3,0.5,5895.31,1.7007,0.432
+Scarlet,4,Potencial,4,0.5,7188.37,1.5484,0.3975`;
+  const store={inventario:d3.csvParse(csv),recurso:d3.csvParse(rec)}, draws=[], ons=[];
   window.dash={
     colors:['#2a78d6','#eb6834','#1baf7a','#eda100','#e87ba4','#008300','#6250d6','#e34948'],
     data:(id)=>({status:store[id]?'ok':'missing',data:store[id]||[]}),
@@ -48,7 +66,7 @@ body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:var(-
     params:()=>({}),setParams(){},resetParams(){},setLink(){},refresh(){},loader(){}
   };
   const run=()=>{ons.forEach(f=>f());draws.forEach(([n,f])=>document.querySelectorAll(`[data-draw="${n}"]`).forEach(el=>f(el)));};
-  window.addEventListener('DOMContentLoaded',run);
+  window.addEventListener('DOMContentLoaded',()=>{run();new MutationObserver(()=>setTimeout(run,0)).observe(document.getElementById('dash-root'),{attributes:true,attributeFilter:['hidden'],subtree:true});});
   let t;window.addEventListener('resize',()=>{clearTimeout(t);t=setTimeout(run,150);});
 })();
 </script>
@@ -92,6 +110,18 @@ body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:var(-
 .inv-logo-sec { height: 52px; width: auto; max-width: 45%; object-fit: contain; }
 @media (max-width: 420px) { .inv-logo-main { height: 52px; } .inv-logo-sec { height: 38px; } }
 .inv-sub { font-size: var(--cds-font-size-body); font-weight: var(--cds-font-weight-medium); margin: var(--cds-gap-xl) 0 0; }
+.inv-params { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr)); gap: 1px; background: var(--color-border-line); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); overflow: hidden; }
+.inv-params > div { background: var(--color-panel); padding: var(--cds-pad-sm) var(--cds-pad-md); display: flex; flex-direction: column; gap: 2px; }
+.inv-params .k { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+.inv-params .v { font-size: var(--cds-font-size-heading); font-weight: var(--cds-font-weight-medium); font-variant-numeric: tabular-nums; }
+.inv-tabs { display: flex; gap: var(--cds-gap-xs); border-bottom: 1px solid var(--color-border-line); flex-wrap: wrap; }
+.inv-tabs button { font: inherit; font-size: var(--cds-font-size-body); background: none; border: 0; border-bottom: 2px solid transparent; padding: var(--cds-pad-sm) var(--cds-pad-md); color: var(--color-fg-muted); cursor: pointer; margin-bottom: -1px; }
+.inv-tabs button[aria-selected="true"] { color: var(--color-fg); border-bottom-color: #D4A90F; font-weight: var(--cds-font-weight-medium); }
+.inv-page { display: flex; flex-direction: column; gap: var(--cds-gap-lg); }
+.inv-page[hidden] { display: none; }
+.inv-kpi-pot { border-style: dashed; }
+.inv-table tr.sub td { font-weight: var(--cds-font-weight-medium); }
+.inv-table tr.pot td { color: var(--color-fg-muted); font-style: italic; border-top: 1px dashed var(--color-border-line); }
 </style>
 
 <div class="inv">
@@ -99,6 +129,113 @@ body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:var(-
     <img class="inv-logo-main" src="data:image/webp;base64,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" alt="Consorcio Minero SUNEC">
     <img class="inv-logo-sec" src="data:image/webp;base64,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" alt="Consorcio Minero Horizonte">
   </div>
+
+  <nav class="inv-tabs" role="tablist" aria-label="Inventarios">
+    <button type="button" role="tab" data-tab="recursos" aria-selected="true">Inventario de recurso</button>
+    <button type="button" role="tab" data-tab="reservas" aria-selected="false">Inventario de reservas</button>
+  </nav>
+
+  <section class="inv-page" data-page="recursos" id="recursos">
+  <header class="inv-head">
+    <h1>Inventario de recurso</h1>
+    <p>Medido + Indicado suma <b data-draw="kpi" data-fmt="t" data-source="rec_cat" data-where="grupo=mi" data-field="toneladas">—</b> t a <b data-draw="kpi" data-fmt="g" data-source="rec_cat" data-where="grupo=mi" data-field="ley_au">—</b> g/t Au; el Inferido agrega <b data-draw="kpi" data-fmt="t" data-source="rec_cat" data-where="grupo=inferido" data-field="toneladas">—</b> t. El Potencial se reporta aparte y no entra al total.</p>
+  </header>
+
+  <section class="inv-params" aria-label="Parámetros del recurso">
+    <div><span class="k">Cut-off</span><span class="v">0.50 g/t</span></div>
+    <div><span class="k">Vetas</span><span class="v">4</span></div>
+    <div><span class="k">Fuente</span><span class="v">Modelo de bloques</span></div>
+    <div><span class="k">Excluye</span><span class="v">Categoría 0</span></div>
+  </section>
+
+  <section class="inv-kpis" aria-label="Indicadores del recurso">
+    <div class="inv-card inv-kpi">
+      <p class="lbl">Medido + Indicado</p>
+      <p class="big"><span data-draw="kpi" data-fmt="t" data-source="rec_cat" data-where="grupo=mi" data-field="toneladas">—</span> t</p>
+      <p class="sub"><span data-draw="kpi" data-fmt="g" data-source="rec_cat" data-where="grupo=mi" data-field="ley_au">—</span> g/t · <span data-draw="kpi" data-fmt="oz" data-source="rec_cat" data-where="grupo=mi" data-field="onzas">—</span> oz</p>
+    </div>
+    <div class="inv-card inv-kpi">
+      <p class="lbl">Inferido</p>
+      <p class="big"><span data-draw="kpi" data-fmt="t" data-source="rec_cat" data-where="grupo=inferido" data-field="toneladas">—</span> t</p>
+      <p class="sub"><span data-draw="kpi" data-fmt="g" data-source="rec_cat" data-where="grupo=inferido" data-field="ley_au">—</span> g/t · <span data-draw="kpi" data-fmt="oz" data-source="rec_cat" data-where="grupo=inferido" data-field="onzas">—</span> oz</p>
+    </div>
+    <div class="inv-card inv-kpi">
+      <p class="lbl">Total recurso (M + I + Inf)</p>
+      <p class="big"><span data-draw="kpi" data-fmt="t" data-source="rec_cat" data-where="grupo=total" data-field="toneladas">—</span> t</p>
+      <p class="sub"><span data-draw="kpi" data-fmt="g" data-source="rec_cat" data-where="grupo=total" data-field="ley_au">—</span> g/t · <span data-draw="kpi" data-fmt="oz" data-source="rec_cat" data-where="grupo=total" data-field="onzas">—</span> oz</p>
+    </div>
+    <div class="inv-card inv-kpi inv-kpi-pot">
+      <p class="lbl">Potencial (separado)</p>
+      <p class="big"><span data-draw="kpi" data-fmt="t" data-source="rec_cat" data-where="grupo=potencial" data-field="toneladas">—</span> t</p>
+      <p class="sub"><span data-draw="kpi" data-fmt="g" data-source="rec_cat" data-where="grupo=potencial" data-field="ley_au">—</span> g/t · <span data-draw="kpi" data-fmt="oz" data-source="rec_cat" data-where="grupo=potencial" data-field="onzas">—</span> oz</p>
+    </div>
+  </section>
+
+  <section class="inv-card" id="rec-tabla">
+    <h2>Recurso por categoría</h2>
+    <p class="note">Ley y ancho de veta de los subtotales ponderados por tonelaje. Onzas troy in situ.</p>
+    <div class="inv-table-wrap">
+      <table class="inv-table" data-source="rec_cat" data-row-key="categoria">
+        <thead><tr>
+          <th data-field="categoria">Categoría</th>
+          <th data-field="toneladas">Toneladas</th>
+          <th data-field="ley_au">Ley (g/t)</th>
+          <th data-field="ancho">Ancho veta (m)</th>
+          <th data-field="au_g">Gramos Au (t × g/t)</th>
+          <th data-field="onzas">Onzas (g ÷ 31.1035)</th>
+        </tr></thead>
+        <tbody data-draw="rec_tabla"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="inv-grid">
+    <div class="inv-card" id="rec-tonelaje">
+      <h2>Tonelaje por veta</h2>
+      <p class="note">Toneladas del recurso (sin Potencial), por categoría.</p>
+      <div class="inv-legend"><span><i style="background:#0C447C"></i>Medido</span><span><i style="background:#378ADD"></i>Indicado</span><span><i style="background:#85B7EB"></i>Inferido</span></div>
+      <div class="inv-chart" data-draw="rec_ch_t" data-source="rec_veta"></div>
+    </div>
+    <div class="inv-card" id="rec-onzas">
+      <h2>Oro contenido por veta</h2>
+      <p class="note">Onzas troy in situ (sin Potencial), por categoría.</p>
+      <div class="inv-legend"><span><i style="background:#0C447C"></i>Medido</span><span><i style="background:#378ADD"></i>Indicado</span><span><i style="background:#85B7EB"></i>Inferido</span></div>
+      <div class="inv-chart" data-draw="rec_ch_oz" data-source="rec_veta"></div>
+    </div>
+    <div class="inv-card" id="rec-ley">
+      <h2>Ley de oro por categoría</h2>
+      <p class="note">g/t Au. En gris, el Potencial (fuera del recurso).</p>
+      <div class="inv-chart" data-draw="rec_ch_ley" data-source="rec_cat"></div>
+    </div>
+    <div class="inv-card" id="rec-ancho">
+      <h2>Ancho de veta por categoría</h2>
+      <p class="note">Metros, ponderado por tonelaje.</p>
+      <div class="inv-chart" data-draw="rec_ch_an" data-source="rec_cat"></div>
+    </div>
+  </section>
+
+  <section class="inv-card" id="rec-vetas">
+    <h2>Recurso por veta y categoría</h2>
+    <p class="note">Detalle del modelo de bloques al cut-off de 0.50 g/t.</p>
+    <div class="inv-table-wrap">
+      <table class="inv-table txt2" data-source="rec_det" data-row-key="veta,categoria">
+        <thead><tr>
+          <th data-field="veta">Veta</th>
+          <th data-field="categoria">Categoría</th>
+          <th data-field="toneladas">Toneladas</th>
+          <th data-field="ley_au">Ley (g/t)</th>
+          <th data-field="ancho">Ancho veta (m)</th>
+          <th data-field="onzas">Onzas</th>
+        </tr></thead>
+        <tbody data-draw="rec_tabla_veta"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <p class="inv-foot">Toneladas = masa del modelo de bloques; ley = AUOK; ancho = ANVE. El Potencial no es recurso bajo JORC y NI 43-101: se muestra separado y no se suma al total. Se excluye la categoría 0 (sin clasificar).</p>
+  </section>
+
+  <section class="inv-page" data-page="reservas" id="reservas" hidden>
   <header class="inv-head" id="resumen">
     <h1>Inventario de reservas</h1>
     <p>Probado + Probable suma <b data-draw="kpi" data-fmt="t" data-source="resumen" data-where="grupo=pp" data-field="toneladas">—</b> t a <b data-draw="kpi" data-fmt="g" data-source="resumen" data-where="grupo=pp" data-field="ley_au">—</b> g/t Au; el Inferido operacional agrega <b data-draw="kpi" data-fmt="t" data-source="resumen" data-where="grupo=inf" data-field="toneladas">—</b> t de menor confianza.</p>
@@ -192,6 +329,7 @@ body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:var(-
 
 
   <p class="inv-foot">Onzas contenidas in situ, sin aplicar recuperación metalúrgica. Bajo JORC y NI 43-101 el recurso inferido no se suma a las reservas; aquí se muestra por separado y en el total del inventario de minado.</p>
+  </section>
 </div>
 
 <script>
@@ -250,7 +388,7 @@ function invState(el, id) {
 }
 
 dash.draw('kpi', (el) => {
-  const rows = dash.data('resumen');
+  const rows = dash.data(el.dataset.source);
   if (rows.status !== 'ok') { el.textContent = '—'; return; }
   const [k, v] = (el.dataset.where || '').split('=');
   const row = rows.data.find((r) => String(r[k]) === v);
@@ -376,6 +514,169 @@ dash.draw('tabla', (tb) => {
     tb.appendChild(tr);
   });
 });
+
+const REC_CATS = ['Medido', 'Indicado', 'Inferido'];
+const REC_COL = { Medido: '#0C447C', Indicado: '#378ADD', Inferido: '#85B7EB', Potencial: 'var(--cds-chart-muted)' };
+
+dash.calc('rec_det', {
+  title: 'Recurso con oro contenido',
+  description: 'Cada veta y categoría con gramos y onzas de Au (t × g/t ÷ 31.1035).',
+  inputs: ['recurso'],
+  fn: (recurso) => recurso
+    .map((d) => ({ veta: d.veta, orden_veta: +d.orden_veta, categoria: d.categoria, orden_cat: +d.orden_cat, toneladas: +d.toneladas, ley_au: +d.ley_au, ancho: +d.ancho }))
+    .sort((a, b) => a.orden_veta - b.orden_veta || a.orden_cat - b.orden_cat)
+    .map((d) => ({ ...d, au_g: d.toneladas * d.ley_au, onzas: d.toneladas * d.ley_au / 31.1035 }))
+});
+
+dash.calc('rec_cat', {
+  title: 'Recurso por categoría',
+  description: 'Medido, Indicado, Medido + Indicado, Inferido, Total recurso (sin Potencial) y Potencial aparte; ley y ancho ponderados por tonelaje.',
+  inputs: ['rec_det'],
+  fn: (rec_det) => {
+    const agg = (grupo, categoria, rows) => {
+      const sum = (f) => rows.reduce((s, d) => s + f(d), 0);
+      const t = sum((d) => d.toneladas), g = sum((d) => d.au_g);
+      return { grupo, categoria, toneladas: t, ley_au: g / t, ancho: sum((d) => d.toneladas * d.ancho) / t, au_g: g, onzas: g / 31.1035 };
+    };
+    const of = (...c) => rec_det.filter((d) => c.includes(d.categoria));
+    return [
+      agg('medido', 'Medido', of('Medido')),
+      agg('indicado', 'Indicado', of('Indicado')),
+      agg('mi', 'Medido + Indicado', of('Medido', 'Indicado')),
+      agg('inferido', 'Inferido', of('Inferido')),
+      agg('total', 'Total recurso', of('Medido', 'Indicado', 'Inferido')),
+      agg('potencial', 'Potencial', of('Potencial'))
+    ];
+  }
+});
+
+dash.calc('rec_veta', {
+  title: 'Recurso por veta',
+  description: 'Toneladas y onzas de cada veta por categoría (Medido, Indicado, Inferido), sin Potencial.',
+  inputs: ['rec_det'],
+  fn: (rec_det) => {
+    const vetas = [...new Set(rec_det.map((d) => d.veta))];
+    return vetas.map((veta) => {
+      const r = { veta };
+      ['Medido', 'Indicado', 'Inferido'].forEach((c) => {
+        const d = rec_det.find((x) => x.veta === veta && x.categoria === c);
+        r[c + '_t'] = d ? d.toneladas : 0;
+        r[c + '_oz'] = d ? d.onzas : 0;
+      });
+      return r;
+    });
+  }
+});
+
+window.invStack = function (el, rows, o) {
+  el.replaceChildren();
+  const W = Math.max(240, el.clientWidth || 320), H = 250, top = 22, bottom = 40;
+  const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('role', 'img').attr('aria-label', o.aria);
+  const keys = o.series.map((s) => s.f);
+  const tot = (r) => keys.reduce((s, k) => s + r[k], 0);
+  const max = d3.max(rows, tot) || 1;
+  const y = d3.scaleLinear([0, max * 1.12], [H - bottom, top]).nice();
+  const ticks = y.ticks(4);
+  const probe = svg.append('text').attr('class', 'inv-tick');
+  let lw = 0;
+  ticks.forEach((t) => { probe.text(o.tick(t)); lw = Math.max(lw, probe.node().getComputedTextLength()); });
+  probe.remove();
+  const ml = lw + 10, mr = 6;
+  const x = d3.scaleBand(rows.map((r) => r.veta), [ml, W - mr]).padding(0.3);
+  const bw = Math.min(32, x.bandwidth());
+  const g = svg.append('g');
+  g.selectAll('line').data(ticks).join('line')
+    .attr('x1', ml).attr('x2', W - mr).attr('y1', (t) => y(t)).attr('y2', (t) => y(t))
+    .attr('style', (t) => `stroke:${t === 0 ? 'var(--cds-chart-axis)' : 'var(--cds-chart-grid)'};stroke-width:1`);
+  g.selectAll('text.inv-tick.yt').data(ticks).join('text').attr('class', 'inv-tick yt')
+    .attr('x', ml - 8).attr('y', (t) => y(t)).attr('dy', '0.32em').attr('text-anchor', 'end').text((t) => o.tick(t));
+  const bx = (r) => x(r.veta) + (x.bandwidth() - bw) / 2;
+  const segs = [];
+  rows.forEach((r) => { let acc = 0; o.series.forEach((s) => { segs.push({ r, s, y0: acc, y1: acc + r[s.f] }); acc += r[s.f]; }); });
+  const rects = g.selectAll('rect.seg').data(segs.filter((d) => d.y1 > d.y0)).join('rect').attr('class', 'seg')
+    .attr('x', (d) => bx(d.r)).attr('width', bw)
+    .attr('y', (d) => y(d.y1)).attr('height', (d) => Math.max(0, y(d.y0) - y(d.y1) - 1))
+    .attr('style', (d) => `fill:${d.s.color}`);
+  g.selectAll('text.inv-val').data(rows).join('text').attr('class', 'inv-val')
+    .attr('x', (r) => bx(r) + bw / 2).attr('y', (r) => y(tot(r)) - 6).attr('text-anchor', 'middle').text((r) => o.fmt(tot(r)));
+  const lab = g.selectAll('text.xl').data(rows).join('text').attr('class', 'inv-tick xl')
+    .attr('x', (r) => x(r.veta) + x.bandwidth() / 2).attr('y', H - bottom + 16).attr('text-anchor', 'middle');
+  lab.each(function (r) {
+    const t = d3.select(this); t.text(r.veta);
+    if (this.getComputedTextLength() > x.step() - 4) {
+      t.text(null);
+      r.veta.split(' ').forEach((w, i) => t.append('tspan').attr('x', x(r.veta) + x.bandwidth() / 2).attr('dy', i ? '1.2em' : 0).text(w));
+    }
+  });
+  const tip = document.createElement('div'); tip.className = 'inv-tip'; tip.hidden = true; el.appendChild(tip);
+  g.selectAll('rect.hit').data(rows).join('rect').attr('class', 'hit')
+    .attr('x', (r) => x(r.veta)).attr('width', x.bandwidth()).attr('y', top).attr('height', H - bottom - top)
+    .attr('fill', 'transparent')
+    .on('pointerenter pointermove', function (ev, r) {
+      rects.attr('opacity', (d) => (d.r === r ? 1 : 0.45));
+      tip.replaceChildren();
+      const h = document.createElement('div'); h.className = 't'; h.textContent = r.veta; tip.appendChild(h);
+      o.series.forEach((s) => {
+        const line = document.createElement('div');
+        const sw = document.createElement('span'); sw.className = 'sw'; sw.style.background = s.color; line.appendChild(sw);
+        line.appendChild(document.createTextNode(`${s.name}: ${o.fmt(r[s.f])}${o.unit}`));
+        tip.appendChild(line);
+      });
+      const tl = document.createElement('div'); tl.textContent = `Total: ${o.fmt(tot(r))}${o.unit}`; tip.appendChild(tl);
+      tip.hidden = false;
+      const [px, py] = d3.pointer(ev, el);
+      tip.style.left = `${Math.max(0, Math.min(el.clientWidth - tip.offsetWidth, px + 12))}px`;
+      tip.style.top = `${Math.max(0, py - tip.offsetHeight - 8)}px`;
+    })
+    .on('pointerleave', () => { rects.attr('opacity', 1); tip.hidden = true; });
+};
+
+const recSeries = (suf) => REC_CATS.map((c) => ({ f: c + suf, name: c, color: REC_COL[c] }));
+dash.draw('rec_ch_t', (el) => {
+  const d = invState(el, 'rec_veta'); if (!d) return;
+  invStack(el, d, { aria: 'Tonelaje del recurso por veta y categoría', series: recSeries('_t'), fmt: FMT.t, unit: ' t', tick: d3.format('~s') });
+});
+dash.draw('rec_ch_oz', (el) => {
+  const d = invState(el, 'rec_veta'); if (!d) return;
+  invStack(el, d, { aria: 'Onzas del recurso por veta y categoría', series: recSeries('_oz'), fmt: FMT.oz, unit: ' oz', tick: d3.format('~s') });
+});
+const recCatRows = (el) => { const d = invState(el, 'rec_cat'); return d ? d.filter((r) => ['medido', 'indicado', 'inferido', 'potencial'].includes(r.grupo)) : null; };
+const recColor = (c) => REC_COL[c.r.categoria];
+dash.draw('rec_ch_ley', (el) => {
+  const rows = recCatRows(el); if (!rows) return;
+  invBar(el, rows, { aria: 'Ley de oro por categoría del recurso', series: [{ f: 'ley_au', name: 'Ley Au' }], color: recColor, fmt: FMT.g, unit: ' g/t', tick: d3.format('.0f') });
+});
+dash.draw('rec_ch_an', (el) => {
+  const rows = recCatRows(el); if (!rows) return;
+  invBar(el, rows, { aria: 'Ancho de veta por categoría del recurso', series: [{ f: 'ancho', name: 'Ancho veta' }], color: recColor, fmt: FMT.m, unit: ' m', tick: d3.format('.1f') });
+});
+
+window.invRowsTable = (tb, id, cols, cls) => {
+  const d = dash.data(id);
+  tb.replaceChildren();
+  if (d.status !== 'ok') return;
+  d.data.forEach((r) => {
+    const tr = document.createElement('tr');
+    const c = cls ? cls(r) : '';
+    if (c) tr.className = c;
+    cols.forEach(([f, fmt]) => { const td = document.createElement('td'); td.textContent = fmt(r[f]); tr.appendChild(td); });
+    tb.appendChild(tr);
+  });
+};
+dash.draw('rec_tabla', (tb) => invRowsTable(tb, 'rec_cat',
+  [['categoria', (v) => v], ['toneladas', FMT.t], ['ley_au', FMT.g], ['ancho', FMT.m], ['au_g', FMT.gr], ['onzas', FMT.oz]],
+  (r) => ({ mi: 'sub', total: 'tot', potencial: 'pot' }[r.grupo] || '')));
+dash.draw('rec_tabla_veta', (tb) => invRowsTable(tb, 'rec_det',
+  [['veta', (v) => v], ['categoria', (v) => v], ['toneladas', FMT.t], ['ley_au', FMT.g], ['ancho', FMT.m], ['onzas', FMT.oz]],
+  (r) => (r.categoria === 'Potencial' ? 'pot' : '')));
+
+const invTabs = (name) => {
+  document.querySelectorAll('.inv-tabs [data-tab]').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.tab === name)));
+  document.querySelectorAll('.inv-page[data-page]').forEach((p) => { p.hidden = p.dataset.page !== name; });
+};
+document.querySelectorAll('.inv-tabs [data-tab]').forEach((b) => b.addEventListener('click', () => { invTabs(b.dataset.tab); dash.setLink(b.dataset.tab); }));
+const invStart = location.hash.slice(1);
+if (invStart === 'reservas' || invStart === 'recursos') invTabs(invStart);
 </script>
 
 </div></body></html>
