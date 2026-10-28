@@ -27,6 +27,10 @@
 body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:var(--font-anthropic-sans)}
 #dash-root{max-width:1200px;margin:0 auto;padding:24px 16px}
 @media print{.inv-chart{break-inside:avoid}}
+.inv-params { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 9rem), 1fr)); gap: 1px; background: var(--color-border-line); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); overflow: hidden; }
+.inv-params > div { background: var(--color-panel); padding: var(--cds-pad-sm) var(--cds-pad-md); display: flex; flex-direction: column; gap: 2px; }
+.inv-params .k { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+.inv-params .v { font-size: var(--cds-font-size-heading); font-weight: var(--cds-font-weight-medium); font-variant-numeric: tabular-nums; }
 </style>
 <script>
 (function(){
@@ -99,6 +103,14 @@ body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:var(-
     <h1>Inventario de reservas</h1>
     <p>Probado + Probable suma <b data-draw="kpi" data-fmt="t" data-source="resumen" data-where="grupo=pp" data-field="toneladas">—</b> t a <b data-draw="kpi" data-fmt="g" data-source="resumen" data-where="grupo=pp" data-field="ley_au">—</b> g/t Au; el Inferido operacional agrega <b data-draw="kpi" data-fmt="t" data-source="resumen" data-where="grupo=inf" data-field="toneladas">—</b> t de menor confianza.</p>
   </header>
+
+  <section class="inv-params" aria-label="Parámetros de estimación">
+    <div><span class="k">Precio (inventario)</span><span class="v">3,200 US$/oz</span></div>
+    <div><span class="k">Cut-off</span><span class="v">1.97 g/t</span></div>
+    <div><span class="k">Recuperación</span><span class="v">93 %</span></div>
+    <div><span class="k">MMW</span><span class="v">0.80 m</span></div>
+    <div><span class="k">ELOS</span><span class="v">0 m</span></div>
+  </section>
 
   <section class="inv-kpis" aria-label="Indicadores">
     <div class="inv-card inv-kpi">
