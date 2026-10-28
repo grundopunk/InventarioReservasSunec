@@ -141,14 +141,14 @@ Scarlet,4,Potencial,4,0.5,7188.37,1.5484,0.3975`;
   <section class="inv-page" data-page="recursos" id="recursos">
   <header class="inv-head">
     <h1>Inventario de recurso</h1>
-    <p>Medido + Indicado suma <b data-draw="kpi" data-fmt="t" data-source="rec_cat" data-where="grupo=mi" data-field="toneladas">—</b> t a <b data-draw="kpi" data-fmt="g" data-source="rec_cat" data-where="grupo=mi" data-field="ley_au">—</b> g/t Au; el Inferido agrega <b data-draw="kpi" data-fmt="t" data-source="rec_cat" data-where="grupo=inferido" data-field="toneladas">—</b> t. El Potencial se reporta aparte y no entra al total.</p>
+    <p>Medido + Indicado suma <b data-draw="kpi" data-fmt="t" data-source="rec_cat" data-where="grupo=mi" data-field="toneladas">—</b> t a <b data-draw="kpi" data-fmt="g" data-source="rec_cat" data-where="grupo=mi" data-field="ley_au">—</b> g/t Au; el Inferido agrega <b data-draw="kpi" data-fmt="t" data-source="rec_cat" data-where="grupo=inferido" data-field="toneladas">—</b> t. El Potencial y la veta Scarlet se reportan aparte y no entran al total.</p>
   </header>
 
   <section class="inv-params" aria-label="Parámetros del recurso">
     <div><span class="k">Cut-off</span><span class="v">0.50 g/t</span></div>
-    <div><span class="k">Vetas</span><span class="v">4</span></div>
+    <div><span class="k">Vetas en inventario</span><span class="v">3 (Pierina)</span></div>
     <div><span class="k">Fuente</span><span class="v">Modelo de bloques</span></div>
-    <div><span class="k">Excluye</span><span class="v">Categoría 0</span></div>
+    <div><span class="k">Excluye</span><span class="v">Categoría 0 · Scarlet</span></div>
   </section>
 
   <section class="inv-kpis" aria-label="Indicadores del recurso">
@@ -172,11 +172,16 @@ Scarlet,4,Potencial,4,0.5,7188.37,1.5484,0.3975`;
       <p class="big"><span data-draw="kpi" data-fmt="t" data-source="rec_cat" data-where="grupo=potencial" data-field="toneladas">—</span> t</p>
       <p class="sub"><span data-draw="kpi" data-fmt="g" data-source="rec_cat" data-where="grupo=potencial" data-field="ley_au">—</span> g/t · <span data-draw="kpi" data-fmt="oz" data-source="rec_cat" data-where="grupo=potencial" data-field="onzas">—</span> oz</p>
     </div>
+    <div class="inv-card inv-kpi inv-kpi-pot">
+      <p class="lbl">Veta Scarlet (separado)</p>
+      <p class="big"><span data-draw="kpi" data-fmt="t" data-source="rec_scar" data-where="grupo=total" data-field="toneladas">—</span> t</p>
+      <p class="sub"><span data-draw="kpi" data-fmt="g" data-source="rec_scar" data-where="grupo=total" data-field="ley_au">—</span> g/t · <span data-draw="kpi" data-fmt="oz" data-source="rec_scar" data-where="grupo=total" data-field="onzas">—</span> oz (M + I + Inf)</p>
+    </div>
   </section>
 
   <section class="inv-card" id="rec-tabla">
     <h2>Recurso por categoría</h2>
-    <p class="note">Ley y ancho de veta de los subtotales ponderados por tonelaje. Onzas troy in situ.</p>
+    <p class="note">Vetas Pierina Piso, Centro y Techo (sin Scarlet). Ley y ancho de los subtotales ponderados por tonelaje. Onzas troy in situ.</p>
     <div class="inv-table-wrap">
       <table class="inv-table" data-source="rec_cat" data-row-key="categoria">
         <thead><tr>
@@ -195,31 +200,31 @@ Scarlet,4,Potencial,4,0.5,7188.37,1.5484,0.3975`;
   <section class="inv-grid">
     <div class="inv-card" id="rec-tonelaje">
       <h2>Tonelaje por veta</h2>
-      <p class="note">Toneladas del recurso (sin Potencial), por categoría.</p>
+      <p class="note">Toneladas del recurso (sin Potencial ni Scarlet), por categoría.</p>
       <div class="inv-legend"><span><i style="background:#0C447C"></i>Medido</span><span><i style="background:#378ADD"></i>Indicado</span><span><i style="background:#85B7EB"></i>Inferido</span></div>
       <div class="inv-chart" data-draw="rec_ch_t" data-source="rec_veta"></div>
     </div>
     <div class="inv-card" id="rec-onzas">
       <h2>Oro contenido por veta</h2>
-      <p class="note">Onzas troy in situ (sin Potencial), por categoría.</p>
+      <p class="note">Onzas troy in situ (sin Potencial ni Scarlet), por categoría.</p>
       <div class="inv-legend"><span><i style="background:#0C447C"></i>Medido</span><span><i style="background:#378ADD"></i>Indicado</span><span><i style="background:#85B7EB"></i>Inferido</span></div>
       <div class="inv-chart" data-draw="rec_ch_oz" data-source="rec_veta"></div>
     </div>
     <div class="inv-card" id="rec-ley">
       <h2>Ley de oro por categoría</h2>
-      <p class="note">g/t Au. En gris, el Potencial (fuera del recurso).</p>
+      <p class="note">g/t Au, sin Scarlet. En gris, el Potencial (fuera del recurso).</p>
       <div class="inv-chart" data-draw="rec_ch_ley" data-source="rec_cat"></div>
     </div>
     <div class="inv-card" id="rec-ancho">
       <h2>Ancho de veta por categoría</h2>
-      <p class="note">Metros, ponderado por tonelaje.</p>
+      <p class="note">Metros, ponderado por tonelaje, sin Scarlet.</p>
       <div class="inv-chart" data-draw="rec_ch_an" data-source="rec_cat"></div>
     </div>
   </section>
 
   <section class="inv-card" id="rec-vetas">
     <h2>Recurso por veta y categoría</h2>
-    <p class="note">Detalle del modelo de bloques al cut-off de 0.50 g/t.</p>
+    <p class="note">Vetas Pierina, del modelo de bloques al cut-off de 0.50 g/t.</p>
     <div class="inv-table-wrap">
       <table class="inv-table txt2" data-source="rec_det" data-row-key="veta,categoria">
         <thead><tr>
@@ -235,7 +240,25 @@ Scarlet,4,Potencial,4,0.5,7188.37,1.5484,0.3975`;
     </div>
   </section>
 
-  <p class="inv-foot">Toneladas = masa del modelo de bloques; ley = AUOK; ancho = ANVE. El Potencial no es recurso bajo JORC y NI 43-101: se muestra separado y no se suma al total. Se excluye la categoría 0 (sin clasificar).</p>
+  <section class="inv-card" id="rec-scarlet">
+    <h2>Veta Scarlet (fuera del inventario)</h2>
+    <p class="note">Se reporta aparte y no se suma al total del recurso. Mismo cut-off de 0.50 g/t.</p>
+    <div class="inv-table-wrap">
+      <table class="inv-table" data-source="rec_scar" data-row-key="categoria">
+        <thead><tr>
+          <th data-field="categoria">Categoría</th>
+          <th data-field="toneladas">Toneladas</th>
+          <th data-field="ley_au">Ley (g/t)</th>
+          <th data-field="ancho">Ancho veta (m)</th>
+          <th data-field="au_g">Gramos Au (t × g/t)</th>
+          <th data-field="onzas">Onzas (g ÷ 31.1035)</th>
+        </tr></thead>
+        <tbody data-draw="rec_tabla_scar"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <p class="inv-foot">Toneladas = masa del modelo de bloques; ley = AUOK; ancho = ANVE. El Potencial no es recurso bajo JORC y NI 43-101: se muestra separado y no se suma al total. Se excluye la categoría 0 (sin clasificar). La veta Scarlet se muestra aparte y no entra al total del inventario.</p>
   </section>
 
   <section class="inv-page" data-page="reservas" id="reservas" hidden>
@@ -537,7 +560,7 @@ dash.calc('rec_det', {
 
 dash.calc('rec_cat', {
   title: 'Recurso por categoría',
-  description: 'Medido, Indicado, Medido + Indicado, Inferido, Total recurso (sin Potencial) y Potencial aparte; ley y ancho ponderados por tonelaje.',
+  description: 'Vetas Pierina (sin Scarlet): Medido, Indicado, Medido + Indicado, Inferido, Total recurso (sin Potencial) y Potencial aparte; ley y ancho ponderados por tonelaje.',
   inputs: ['rec_det'],
   fn: (rec_det) => {
     const agg = (grupo, categoria, rows) => {
@@ -545,7 +568,7 @@ dash.calc('rec_cat', {
       const t = sum((d) => d.toneladas), g = sum((d) => d.au_g);
       return { grupo, categoria, toneladas: t, ley_au: g / t, ancho: sum((d) => d.toneladas * d.ancho) / t, au_g: g, onzas: g / 31.1035 };
     };
-    const of = (...c) => rec_det.filter((d) => c.includes(d.categoria));
+    const of = (...c) => rec_det.filter((d) => d.veta !== 'Scarlet' && c.includes(d.categoria));
     return [
       agg('medido', 'Medido', of('Medido')),
       agg('indicado', 'Indicado', of('Indicado')),
@@ -559,10 +582,10 @@ dash.calc('rec_cat', {
 
 dash.calc('rec_veta', {
   title: 'Recurso por veta',
-  description: 'Toneladas y onzas de cada veta por categoría (Medido, Indicado, Inferido), sin Potencial.',
+  description: 'Toneladas y onzas de cada veta Pierina por categoría (Medido, Indicado, Inferido), sin Potencial ni Scarlet.',
   inputs: ['rec_det'],
   fn: (rec_det) => {
-    const vetas = [...new Set(rec_det.map((d) => d.veta))];
+    const vetas = [...new Set(rec_det.map((d) => d.veta))].filter((v) => v !== 'Scarlet');
     return vetas.map((veta) => {
       const r = { veta };
       ['Medido', 'Indicado', 'Inferido'].forEach((c) => {
@@ -638,6 +661,28 @@ window.invStack = function (el, rows, o) {
     .on('pointerleave', () => { rects.attr('opacity', 1); tip.hidden = true; });
 };
 
+dash.calc('rec_scar', {
+  title: 'Veta Scarlet aparte',
+  description: 'Solo la veta Scarlet por categoría, con su total (M + I + Inf) y Potencial; fuera del total del inventario.',
+  inputs: ['rec_det'],
+  fn: (rec_det) => {
+    const agg = (grupo, categoria, rows) => {
+      const sum = (f) => rows.reduce((s, d) => s + f(d), 0);
+      const t = sum((d) => d.toneladas), g = sum((d) => d.au_g);
+      return { grupo, categoria, toneladas: t, ley_au: g / t, ancho: sum((d) => d.toneladas * d.ancho) / t, au_g: g, onzas: g / 31.1035 };
+    };
+    const of = (...c) => rec_det.filter((d) => d.veta === 'Scarlet' && c.includes(d.categoria));
+    return [
+      agg('medido', 'Medido', of('Medido')),
+      agg('indicado', 'Indicado', of('Indicado')),
+      agg('mi', 'Medido + Indicado', of('Medido', 'Indicado')),
+      agg('inferido', 'Inferido', of('Inferido')),
+      agg('total', 'Total Scarlet', of('Medido', 'Indicado', 'Inferido')),
+      agg('potencial', 'Potencial', of('Potencial'))
+    ];
+  }
+});
+
 const recSeries = (suf) => REC_CATS.map((c) => ({ f: c + suf, name: c, color: REC_COL[c] }));
 dash.draw('rec_ch_t', (el) => {
   const d = invState(el, 'rec_veta'); if (!d) return;
@@ -658,11 +703,11 @@ dash.draw('rec_ch_an', (el) => {
   invBar(el, rows, { aria: 'Ancho de veta por categoría del recurso', series: [{ f: 'ancho', name: 'Ancho veta' }], color: recColor, fmt: FMT.m, unit: ' m', tick: d3.format('.1f') });
 });
 
-window.invRowsTable = (tb, id, cols, cls) => {
+window.invRowsTable = (tb, id, cols, cls, keep) => {
   const d = dash.data(id);
   tb.replaceChildren();
   if (d.status !== 'ok') return;
-  d.data.forEach((r) => {
+  d.data.filter(keep || (() => true)).forEach((r) => {
     const tr = document.createElement('tr');
     const c = cls ? cls(r) : '';
     if (c) tr.className = c;
@@ -675,7 +720,10 @@ dash.draw('rec_tabla', (tb) => invRowsTable(tb, 'rec_cat',
   (r) => ({ mi: 'sub', total: 'tot', potencial: 'pot' }[r.grupo] || '')));
 dash.draw('rec_tabla_veta', (tb) => invRowsTable(tb, 'rec_det',
   [['veta', (v) => v], ['categoria', (v) => v], ['toneladas', FMT.t], ['ley_au', FMT.g], ['ancho', FMT.m], ['onzas', FMT.oz]],
-  (r) => (r.categoria === 'Potencial' ? 'pot' : '')));
+  (r) => (r.categoria === 'Potencial' ? 'pot' : ''), (r) => r.veta !== 'Scarlet'));
+dash.draw('rec_tabla_scar', (tb) => invRowsTable(tb, 'rec_scar',
+  [['categoria', (v) => v], ['toneladas', FMT.t], ['ley_au', FMT.g], ['ancho', FMT.m], ['au_g', FMT.gr], ['onzas', FMT.oz]],
+  (r) => ({ mi: 'sub', total: 'tot', potencial: 'pot' }[r.grupo] || '')));
 
 const invTabs = (name) => {
   document.querySelectorAll('.inv-tabs [data-tab]').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.tab === name)));
