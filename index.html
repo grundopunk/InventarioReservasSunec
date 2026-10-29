@@ -300,9 +300,7 @@ Scarlet,4,Potencial,4,0.5,7188.37,1.5484,0.3975`;
           <th data-field="elos">ELOS (m)</th>
           <th data-field="toneladas">Toneladas</th>
           <th data-field="ley_au">Ley (g/t)</th>
-          <th data-field="onzas">Onzas</th>
           <th data-field="pp_t">P + P (t)</th>
-          <th data-field="pp_oz">P + P (oz)</th>
           <th data-field="ancho_dil">Ancho diluido (m)</th>
         </tr></thead>
         <tbody data-draw="tabla_esc"></tbody>
@@ -850,7 +848,7 @@ dash.calc('escenarios', {
   fn: (resumen, resumen2, resumen3, resumen4) => {
     const row = (escenario, cutoff, mmw, elos, res) => {
       const tot = res.find((d) => d.grupo === 'total'), pp = res.find((d) => d.grupo === 'pp');
-      return { escenario, cutoff, mmw, elos, toneladas: tot.toneladas, ley_au: tot.ley_au, onzas: tot.onzas, pp_t: pp.toneladas, pp_oz: pp.onzas, ancho_dil: tot.ancho_dil };
+      return { escenario, cutoff, mmw, elos, toneladas: tot.toneladas, ley_au: tot.ley_au, pp_t: pp.toneladas, ancho_dil: tot.ancho_dil };
     };
     const e1 = row('Escenario 1', 1.97, 0.8, 0, resumen);
     const e2 = row('Escenario 2', 1.85, 1.0, 0, resumen2);
@@ -1165,7 +1163,7 @@ dash.draw('tabla_esc', (tb) => {
   d.data.forEach((r, i) => {
     const dif = r.escenario.startsWith('Δ');
     const f = (fn) => (dif ? sgn(fn) : fn);
-    const cols = [['escenario', (v) => v], ['cutoff', f(FMT.g)], ['mmw', f(FMT.m)], ['elos', f(FMT.m)], ['toneladas', f(FMT.t)], ['ley_au', f(FMT.g)], ['onzas', f(FMT.oz)], ['pp_t', f(FMT.t)], ['pp_oz', f(FMT.oz)], ['ancho_dil', f(FMT.m)]];
+    const cols = [['escenario', (v) => v], ['cutoff', f(FMT.g)], ['mmw', f(FMT.m)], ['elos', f(FMT.m)], ['toneladas', f(FMT.t)], ['ley_au', f(FMT.g)], ['pp_t', f(FMT.t)], ['ancho_dil', f(FMT.m)]];
     const tr = document.createElement('tr');
     if (dif) tr.className = 'dif';
     cols.forEach(([k, fmt]) => { const td = document.createElement('td'); td.textContent = fmt(r[k]); tr.appendChild(td); });
