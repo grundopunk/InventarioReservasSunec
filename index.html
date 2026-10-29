@@ -35,6 +35,12 @@ body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:var(-
 .inv-footer { background: #032D45; color: #ffffff; border-radius: var(--cds-radius); padding: var(--cds-pad-md) var(--cds-pad-lg); display: flex; justify-content: space-between; align-items: center; gap: var(--cds-gap-md); flex-wrap: wrap; font-size: var(--cds-font-size-caption); border-top: 3px solid #B09A3B; }
 .inv .inv-footer b { color: #ffffff; font-weight: var(--cds-font-weight-medium); }
 .inv-footer span:last-child { color: #D9C98A; letter-spacing: .08em; }
+.inv-seg { display: flex; gap: var(--cds-gap-xs); flex-wrap: wrap; background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: 4px; }
+.inv-seg button { font: inherit; font-size: var(--cds-font-size-caption); flex: 1 1 14rem; border: 0; border-radius: calc(var(--cds-radius) - 2px); background: none; color: var(--color-fg-muted); padding: var(--cds-pad-sm) var(--cds-pad-md); cursor: pointer; }
+.inv-seg button[aria-selected="true"] { background: #032D45; color: #ffffff; }
+.inv-esc { display: flex; flex-direction: column; gap: var(--cds-gap-lg); }
+.inv-esc[hidden] { display: none; }
+.inv-table tr.dif td { color: var(--color-fg-muted); border-top: 1px dashed var(--color-border-line); }
 </style>
 <script>
 (function(){
@@ -59,7 +65,11 @@ Scarlet,4,Medido,1,0.5,3650.37,2.8624,0.6613
 Scarlet,4,Indicado,2,0.5,3075.4,2.0854,0.4568
 Scarlet,4,Inferido,3,0.5,5895.31,1.7007,0.432
 Scarlet,4,Potencial,4,0.5,7188.37,1.5484,0.3975`;
-  const store={inventario:d3.csvParse(csv),recurso:d3.csvParse(rec)}, draws=[], ons=[];
+  const csv2=`orden,categoria,toneladas,ley_au,ancho_geo,ancho_dil
+1,Probado,37155,5.08,0.52,1.39
+2,Probable,75829,5.03,0.49,1.21
+3,Inferido operacional,62592,4.80,0.45,1.11`;
+  const store={inventario:d3.csvParse(csv),inventario2:d3.csvParse(csv2),recurso:d3.csvParse(rec)}, draws=[], ons=[];
   window.dash={
     colors:['#2a78d6','#eb6834','#1baf7a','#eda100','#e87ba4','#008300','#6250d6','#e34948'],
     data:(id)=>({status:store[id]?'ok':'missing',data:store[id]||[]}),
@@ -262,8 +272,39 @@ Scarlet,4,Potencial,4,0.5,7188.37,1.5484,0.3975`;
   </section>
 
   <section class="inv-page" data-page="reservas" id="reservas" hidden>
-  <header class="inv-head" id="resumen">
+  <header class="inv-head">
     <h1>Inventario de reservas</h1>
+    <p>Dos escenarios de estimación que cambian el cut-off y el ancho mínimo de minado (MMW). Precio, recuperación y ELOS se mantienen.</p>
+  </header>
+
+  <section class="inv-card" id="escenarios">
+    <h2>Comparación de escenarios</h2>
+    <p class="note">Total del inventario (Probado + Probable + Inferido operacional). Ley y ancho ponderados por tonelaje.</p>
+    <div class="inv-table-wrap">
+      <table class="inv-table" data-source="escenarios" data-row-key="escenario">
+        <thead><tr>
+          <th data-field="escenario">Escenario</th>
+          <th data-field="cutoff">Cut-off (g/t)</th>
+          <th data-field="mmw">MMW (m)</th>
+          <th data-field="toneladas">Toneladas</th>
+          <th data-field="ley_au">Ley (g/t)</th>
+          <th data-field="onzas">Onzas</th>
+          <th data-field="pp_t">P + P (t)</th>
+          <th data-field="pp_oz">P + P (oz)</th>
+          <th data-field="ancho_dil">Ancho diluido (m)</th>
+        </tr></thead>
+        <tbody data-draw="tabla_esc"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <nav class="inv-seg" role="tablist" aria-label="Escenario">
+    <button type="button" role="tab" data-esc-btn="1" aria-selected="true">Escenario 1 · Cut-off 1.97 g/t · MMW 0.80 m</button>
+    <button type="button" role="tab" data-esc-btn="2" aria-selected="false">Escenario 2 · Cut-off 1.85 g/t · MMW 1.00 m</button>
+  </nav>
+
+  <div class="inv-esc" data-esc="1">
+  <header class="inv-head" id="resumen">
     <p>Probado + Probable suma <b data-draw="kpi" data-fmt="t" data-source="resumen" data-where="grupo=pp" data-field="toneladas">—</b> t a <b data-draw="kpi" data-fmt="g" data-source="resumen" data-where="grupo=pp" data-field="ley_au">—</b> g/t Au; el Inferido operacional agrega <b data-draw="kpi" data-fmt="t" data-source="resumen" data-where="grupo=inf" data-field="toneladas">—</b> t de menor confianza.</p>
   </header>
 
@@ -354,6 +395,102 @@ Scarlet,4,Potencial,4,0.5,7188.37,1.5484,0.3975`;
   </section>
 
 
+  </div>
+
+  <div class="inv-esc" data-esc="2" hidden>
+  <header class="inv-head" id="resumen-e2">
+    <p>Probado + Probable suma <b data-draw="kpi" data-fmt="t" data-source="resumen2" data-where="grupo=pp" data-field="toneladas">—</b> t a <b data-draw="kpi" data-fmt="g" data-source="resumen2" data-where="grupo=pp" data-field="ley_au">—</b> g/t Au; el Inferido operacional agrega <b data-draw="kpi" data-fmt="t" data-source="resumen2" data-where="grupo=inf" data-field="toneladas">—</b> t de menor confianza.</p>
+  </header>
+
+  <section class="inv-params" aria-label="Parámetros de estimación">
+    <div><span class="k">Precio (inventario)</span><span class="v">3,200 US$/oz</span></div>
+    <div><span class="k">Cut-off</span><span class="v">1.85 g/t</span></div>
+    <div><span class="k">Recuperación</span><span class="v">93 %</span></div>
+    <div><span class="k">MMW</span><span class="v">1.00 m</span></div>
+    <div><span class="k">ELOS</span><span class="v">0 m</span></div>
+  </section>
+
+  <section class="inv-kpis" aria-label="Indicadores">
+    <div class="inv-card inv-kpi">
+      <p class="lbl">Probado + Probable</p>
+      <p class="big"><span data-draw="kpi" data-fmt="t" data-source="resumen2" data-where="grupo=pp" data-field="toneladas">—</span> t</p>
+      <p class="sub"><span data-draw="kpi" data-fmt="g" data-source="resumen2" data-where="grupo=pp" data-field="ley_au">—</span> g/t · <span data-draw="kpi" data-fmt="oz" data-source="resumen2" data-where="grupo=pp" data-field="onzas">—</span> oz</p>
+    </div>
+    <div class="inv-card inv-kpi">
+      <p class="lbl">Inferido operacional</p>
+      <p class="big"><span data-draw="kpi" data-fmt="t" data-source="resumen2" data-where="grupo=inf" data-field="toneladas">—</span> t</p>
+      <p class="sub"><span data-draw="kpi" data-fmt="g" data-source="resumen2" data-where="grupo=inf" data-field="ley_au">—</span> g/t · <span data-draw="kpi" data-fmt="oz" data-source="resumen2" data-where="grupo=inf" data-field="onzas">—</span> oz</p>
+    </div>
+    <div class="inv-card inv-kpi">
+      <p class="lbl">Total inventario</p>
+      <p class="big"><span data-draw="kpi" data-fmt="t" data-source="resumen2" data-where="grupo=total" data-field="toneladas">—</span> t</p>
+      <p class="sub"><span data-draw="kpi" data-fmt="g" data-source="resumen2" data-where="grupo=total" data-field="ley_au">—</span> g/t · <span data-draw="kpi" data-fmt="oz" data-source="resumen2" data-where="grupo=total" data-field="onzas">—</span> oz</p>
+    </div>
+    <div class="inv-card inv-kpi">
+      <p class="lbl">Ancho geológico / diluido</p>
+      <p class="big"><span data-draw="kpi" data-fmt="m" data-source="resumen2" data-where="grupo=total" data-field="ancho_geo">—</span> / <span data-draw="kpi" data-fmt="m" data-source="resumen2" data-where="grupo=total" data-field="ancho_dil">—</span> m</p>
+      <p class="sub">Dilución <span data-draw="kpi" data-fmt="x" data-source="resumen2" data-where="grupo=total" data-field="dilucion">—</span>× el ancho geológico</p>
+    </div>
+  </section>
+
+  <section class="inv-card" id="tabla-e2">
+    <h2>Detalle del inventario</h2>
+    <p class="note">Ley del total ponderada por tonelaje. Onzas troy in situ.</p>
+    <div class="inv-table-wrap">
+      <table class="inv-table" data-source="detalle2" data-row-key="categoria">
+        <thead><tr>
+          <th data-field="categoria">Categoría</th>
+          <th data-field="toneladas">Toneladas</th>
+          <th data-field="ley_au">Ley (g/t)</th>
+          <th data-field="au_g">Gramos Au (t × g/t)</th>
+          <th data-field="onzas">Onzas (g ÷ 31.1035)</th>
+        </tr></thead>
+        <tbody data-draw="tabla_e2"></tbody>
+      </table>
+    </div>
+    <h3 class="inv-sub">Tonelaje, ley y anchos</h3>
+    <p class="note">Ley y anchos del total ponderados por tonelaje.</p>
+    <div class="inv-table-wrap">
+      <table class="inv-table" data-source="detalle2" data-row-key="categoria">
+        <thead><tr>
+          <th data-field="categoria">Categoría</th>
+          <th data-field="toneladas">Toneladas</th>
+          <th data-field="ley_au">Ley (g/t)</th>
+          <th data-field="ancho_geo">Ancho geológico (m)</th>
+          <th data-field="ancho_dil">Ancho diluido (m)</th>
+        </tr></thead>
+        <tbody data-draw="tabla2_e2"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="inv-grid">
+    <div class="inv-card" id="tonelaje-e2">
+      <h2>Tonelaje por categoría</h2>
+      <p class="note">Toneladas in situ. En gris, la categoría de menor confianza.</p>
+      <div class="inv-chart" data-draw="ch_t2" data-source="detalle2"></div>
+    </div>
+    <div class="inv-card" id="ley-e2">
+      <h2>Ley de oro por categoría</h2>
+      <p class="note">Ley media en g/t Au.</p>
+      <div class="inv-chart" data-draw="ch_ley2" data-source="detalle2"></div>
+    </div>
+    <div class="inv-card" id="onzas-e2">
+      <h2>Oro contenido por categoría</h2>
+      <p class="note">Onzas troy in situ = t × g/t ÷ 31.1035.</p>
+      <div class="inv-chart" data-draw="ch_oz2" data-source="detalle2"></div>
+    </div>
+    <div class="inv-card" id="anchos-e2">
+      <h2>Ancho geológico vs diluido</h2>
+      <p class="note">Metros. La diferencia es la dilución por minado.</p>
+      <div class="inv-legend"><span><i class="sw-geo"></i>Geológico</span><span><i class="hatch sw-dil"></i>Diluido</span></div>
+      <div class="inv-chart" data-draw="ch_anch2" data-source="detalle2"></div>
+    </div>
+  </section>
+
+
+  </div>
+
   <p class="inv-foot">Onzas contenidas in situ, sin aplicar recuperación metalúrgica. Bajo JORC y NI 43-101 el recurso inferido no se suma a las reservas; aquí se muestra por separado y en el total del inventario de minado.</p>
   </section>
   <footer class="inv-footer">
@@ -397,6 +534,56 @@ dash.calc('resumen', {
       agg('inf', cats.filter((d) => d.categoria === 'Inferido operacional')),
       agg('total', cats)
     ];
+  }
+});
+dash.calc('detalle2', {
+  title: 'Detalle escenario 2',
+  description: 'Cada categoría con gramos y onzas de Au (t × g/t ÷ 31.1035), más una fila Total ponderada por tonelaje.',
+  inputs: ['inventario2'],
+  fn: (inventario2) => {
+    const r = inventario2
+      .map((d) => ({ orden: +d.orden, categoria: d.categoria, toneladas: +d.toneladas, ley_au: +d.ley_au, ancho_geo: +d.ancho_geo, ancho_dil: +d.ancho_dil }))
+      .sort((a, b) => a.orden - b.orden)
+      .map((d) => ({ ...d, au_g: d.toneladas * d.ley_au, onzas: d.toneladas * d.ley_au / 31.1035 }));
+    const sum = (f) => r.reduce((s, d) => s + f(d), 0);
+    const t = sum((d) => d.toneladas), g = sum((d) => d.au_g);
+    return [...r, { orden: 99, categoria: 'Total', toneladas: t, ley_au: g / t, ancho_geo: sum((d) => d.toneladas * d.ancho_geo) / t, ancho_dil: sum((d) => d.toneladas * d.ancho_dil) / t, au_g: g, onzas: g / 31.1035 }];
+  }
+});
+
+dash.calc('resumen2', {
+  title: 'Resumen escenario 2',
+  description: 'Probado + Probable, Inferido operacional y Total: toneladas, ley y anchos ponderados por tonelaje, onzas y dilución.',
+  inputs: ['detalle2'],
+  fn: (detalle2) => {
+    const cats = detalle2.filter((d) => d.categoria !== 'Total');
+    const agg = (grupo, rows) => {
+      const sum = (f) => rows.reduce((s, d) => s + f(d), 0);
+      const t = sum((d) => d.toneladas), g = sum((d) => d.au_g);
+      const geo = sum((d) => d.toneladas * d.ancho_geo) / t, dil = sum((d) => d.toneladas * d.ancho_dil) / t;
+      return { grupo, toneladas: t, ley_au: g / t, onzas: g / 31.1035, ancho_geo: geo, ancho_dil: dil, dilucion: dil / geo };
+    };
+    return [
+      agg('pp', cats.filter((d) => d.categoria !== 'Inferido operacional')),
+      agg('inf', cats.filter((d) => d.categoria === 'Inferido operacional')),
+      agg('total', cats)
+    ];
+  }
+});
+
+dash.calc('escenarios', {
+  title: 'Comparación de escenarios',
+  description: 'Totales de cada escenario (cut-off y MMW de cada uno) y la diferencia Escenario 2 − Escenario 1.',
+  inputs: ['resumen', 'resumen2'],
+  fn: (resumen, resumen2) => {
+    const row = (escenario, cutoff, mmw, res) => {
+      const tot = res.find((d) => d.grupo === 'total'), pp = res.find((d) => d.grupo === 'pp');
+      return { escenario, cutoff, mmw, toneladas: tot.toneladas, ley_au: tot.ley_au, onzas: tot.onzas, pp_t: pp.toneladas, pp_oz: pp.onzas, ancho_dil: tot.ancho_dil };
+    };
+    const a = row('Escenario 1', 1.97, 0.8, resumen), b = row('Escenario 2', 1.85, 1.0, resumen2);
+    const d = { escenario: 'Diferencia (E2 − E1)' };
+    Object.keys(a).forEach((k) => { if (k !== 'escenario') d[k] = b[k] - a[k]; });
+    return [a, b, d];
   }
 });
 
@@ -544,6 +731,77 @@ dash.draw('tabla', (tb) => {
     tb.appendChild(tr);
   });
 });
+
+const invRows2 = (el) => { const d = invState(el, 'detalle2'); return d ? d.filter((r) => r.categoria !== 'Total') : null; };
+
+dash.draw('ch_t2', (el) => {
+  const rows = invRows2(el); if (!rows) return;
+  invBar(el, rows, { aria: 'Tonelaje por categoría', series: [{ f: 'toneladas', name: 'Tonelaje' }], color: invColor, fmt: FMT.t, unit: ' t', tick: d3.format('~s') });
+});
+dash.draw('ch_ley2', (el) => {
+  const rows = invRows2(el); if (!rows) return;
+  invBar(el, rows, { aria: 'Ley de oro por categoría', series: [{ f: 'ley_au', name: 'Ley Au' }], color: invColor, fmt: FMT.g, unit: ' g/t', tick: d3.format('.0f') });
+});
+dash.draw('ch_oz2', (el) => {
+  const rows = invRows2(el); if (!rows) return;
+  invBar(el, rows, { aria: 'Onzas de oro contenido por categoría', series: [{ f: 'onzas', name: 'Au contenido' }], color: invColor, fmt: FMT.oz, unit: ' oz', tick: d3.format('~s') });
+});
+dash.draw('ch_anch2', (el) => {
+  const rows = invRows2(el); if (!rows) return;
+  invBar(el, rows, {
+    aria: 'Ancho geológico y diluido por categoría', hatch: true,
+    series: [{ f: 'ancho_geo', name: 'Geológico' }, { f: 'ancho_dil', name: 'Diluido' }],
+    color: (c) => (c.si === 0 ? dash.colors[0] : 'url(#inv-hatch)'), fmt: FMT.m, unit: ' m', tick: d3.format('.1f')
+  });
+});
+
+window.invTable2 = (tb, cols) => {
+  const d = dash.data('detalle2');
+  tb.replaceChildren();
+  if (d.status !== 'ok') return;
+  d.data.forEach((r) => {
+    const tr = document.createElement('tr');
+    if (r.categoria === 'Total') tr.className = 'tot';
+    cols.forEach(([f, fmt]) => { const td = document.createElement('td'); td.textContent = fmt(r[f]); tr.appendChild(td); });
+    tb.appendChild(tr);
+  });
+};
+dash.draw('tabla2_e2', (tb) => invTable2(tb, [['categoria', (v) => v], ['toneladas', FMT.t], ['ley_au', FMT.g], ['ancho_geo', FMT.m], ['ancho_dil', FMT.m]]));
+
+dash.draw('tabla_e2', (tb) => {
+  const d = dash.data('detalle2');
+  tb.replaceChildren();
+  if (d.status !== 'ok') return;
+  const cols = [['categoria', (v) => v], ['toneladas', FMT.t], ['ley_au', FMT.g], ['au_g', FMT.gr], ['onzas', FMT.oz]];
+  d.data.forEach((r) => {
+    const tr = document.createElement('tr');
+    if (r.categoria === 'Total') tr.className = 'tot';
+    cols.forEach(([f, fmt]) => { const td = document.createElement('td'); td.textContent = fmt(r[f]); tr.appendChild(td); });
+    tb.appendChild(tr);
+  });
+});
+
+const sgn = (f) => (v) => (v > 0 ? '+' : v < 0 ? '−' : '') + f(Math.abs(v));
+dash.draw('tabla_esc', (tb) => {
+  const d = dash.data('escenarios');
+  tb.replaceChildren();
+  if (d.status !== 'ok') return;
+  d.data.forEach((r, i) => {
+    const dif = i === 2;
+    const f = (fn) => (dif ? sgn(fn) : fn);
+    const cols = [['escenario', (v) => v], ['cutoff', f(FMT.g)], ['mmw', f(FMT.m)], ['toneladas', f(FMT.t)], ['ley_au', f(FMT.g)], ['onzas', f(FMT.oz)], ['pp_t', f(FMT.t)], ['pp_oz', f(FMT.oz)], ['ancho_dil', f(FMT.m)]];
+    const tr = document.createElement('tr');
+    if (dif) tr.className = 'dif';
+    cols.forEach(([k, fmt]) => { const td = document.createElement('td'); td.textContent = fmt(r[k]); tr.appendChild(td); });
+    tb.appendChild(tr);
+  });
+});
+
+const invEsc = (n) => {
+  document.querySelectorAll('.inv-seg [data-esc-btn]').forEach((b) => b.setAttribute('aria-selected', String(b.dataset.escBtn === n)));
+  document.querySelectorAll('.inv-esc[data-esc]').forEach((s) => { s.hidden = s.dataset.esc !== n; });
+};
+document.querySelectorAll('.inv-seg [data-esc-btn]').forEach((b) => b.addEventListener('click', () => invEsc(b.dataset.escBtn)));
 
 const REC_CATS = ['Medido', 'Indicado', 'Inferido'];
 const REC_COL = { Medido: '#0C447C', Indicado: '#378ADD', Inferido: '#85B7EB', Potencial: 'var(--cds-chart-muted)' };
