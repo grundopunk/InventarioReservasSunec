@@ -77,9 +77,9 @@ Scarlet,4,Potencial,4,0.5,7188.37,1.5484,0.3975`;
 2,Probable,76303,4.77,0.44,1.40
 3,Inferido operacional,61677,4.55,0.39,1.32`;
   const csv2=`orden,categoria,toneladas,ley_au,ancho_geo,ancho_dil
-1,Probado,37155,5.08,0.52,1.39
-2,Probable,75829,5.03,0.49,1.21
-3,Inferido operacional,62592,4.80,0.45,1.11`;
+1,Probado,37620,5.04,0.51,1.39
+2,Probable,77720,4.95,0.49,1.21
+3,Inferido operacional,64018,4.73,0.44,1.11`;
   const store={inventario:d3.csvParse(csv),inventario2:d3.csvParse(csv2),inventario3:d3.csvParse(csv3),inventario4:d3.csvParse(csv4),recurso:d3.csvParse(rec)}, draws=[], ons=[];
   window.dash={
     colors:['#2a78d6','#eb6834','#1baf7a','#eda100','#e87ba4','#008300','#6250d6','#e34948'],
@@ -310,7 +310,7 @@ Scarlet,4,Potencial,4,0.5,7188.37,1.5484,0.3975`;
 
   <nav class="inv-seg" role="tablist" aria-label="Escenario">
     <button type="button" role="tab" data-esc-btn="1" aria-selected="true"><b>Escenario 1</b><span>Cut-off 1.97 · MMW 0.80 · ELOS 0</span></button>
-    <button type="button" role="tab" data-esc-btn="2" aria-selected="false"><b>Escenario 2</b><span>Cut-off 1.85 · MMW 1.00 · ELOS 0</span></button>
+    <button type="button" role="tab" data-esc-btn="2" aria-selected="false"><b>Escenario 2</b><span>Cut-off 1.81 · MMW 1.00 · ELOS 0</span></button>
     <button type="button" role="tab" data-esc-btn="3" aria-selected="false"><b>Escenario 3</b><span>Cut-off 1.85 · MMW 1.00 · ELOS 0.20</span></button>
     <button type="button" role="tab" data-esc-btn="4" aria-selected="false"><b>Escenario 4</b><span>Cut-off 1.85 · MMW 0.80 · ELOS 0.40</span></button>
   </nav>
@@ -416,7 +416,7 @@ Scarlet,4,Potencial,4,0.5,7188.37,1.5484,0.3975`;
 
   <section class="inv-params" aria-label="Parámetros de estimación">
     <div><span class="k">Precio (inventario)</span><span class="v">3,200 US$/oz</span></div>
-    <div><span class="k">Cut-off</span><span class="v">1.85 g/t</span></div>
+    <div><span class="k">Cut-off</span><span class="v">1.81 g/t</span></div>
     <div><span class="k">Recuperación</span><span class="v">93 %</span></div>
     <div><span class="k">MMW</span><span class="v">1.00 m</span></div>
     <div><span class="k">ELOS</span><span class="v">0 m</span></div>
@@ -851,7 +851,7 @@ dash.calc('escenarios', {
       return { escenario, cutoff, mmw, elos, toneladas: tot.toneladas, ley_au: tot.ley_au, pp_t: pp.toneladas, ancho_dil: tot.ancho_dil };
     };
     const e1 = row('Escenario 1', 1.97, 0.8, 0, resumen);
-    const e2 = row('Escenario 2', 1.85, 1.0, 0, resumen2);
+    const e2 = row('Escenario 2', 1.81, 1.0, 0, resumen2);
     const e3 = row('Escenario 3', 1.85, 1.0, 0.2, resumen3);
     const e4 = row('Escenario 4', 1.85, 0.8, 0.4, resumen4);
     const dif = (name, b) => {
