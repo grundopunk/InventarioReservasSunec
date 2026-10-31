@@ -51,7 +51,31 @@ Scarlet,4,Medido,1,0.5,3650.37,2.8624,0.6613
 Scarlet,4,Indicado,2,0.5,3075.4,2.0854,0.4568
 Scarlet,4,Inferido,3,0.5,5895.31,1.7007,0.432
 Scarlet,4,Potencial,4,0.5,7188.37,1.5484,0.3975`;
-  const store={inventario:d3.csvParse(csv),recurso:d3.csvParse(rec)}, draws=[], ons=[];
+  const des=`tipo,grupo,orden_grupo,categoria,orden_cat,ton_f,ley_f,ancho_geo,ancho_f
+veta,Pierina Centro,1,Probado,1,2819,2.86,0.77,1.00
+veta,Pierina Centro,1,Probable,2,12885,2.74,0.58,1.00
+veta,Pierina Centro,1,Inferido operacional,3,15756,2.22,0.58,1.00
+veta,Pierina Piso,2,Probado,1,5144,2.75,0.49,1.04
+veta,Pierina Piso,2,Probable,2,11329,2.64,0.44,1.01
+veta,Pierina Piso,2,Inferido operacional,3,10033,1.83,0.39,1.00
+veta,Pierina Techo,3,Probado,1,1672,3.42,0.36,1.03
+veta,Pierina Techo,3,Probable,2,16729,3.10,0.45,1.05
+veta,Pierina Techo,3,Inferido operacional,3,17034,1.95,0.38,1.01
+zona,Balcón,1,Probado,1,1579,2.58,0.52,1.03
+zona,Balcón,1,Probable,2,8736,3.14,0.52,1.10
+zona,Balcón,1,Inferido operacional,3,4218,1.38,0.56,1.02
+zona,Bety,2,Probado,1,1638,2.60,0.58,1.00
+zona,Bety,2,Probable,2,4356,2.16,0.43,1.00
+zona,Bety,2,Inferido operacional,3,7850,1.40,0.37,1.00
+zona,Horizonte,3,Probado,1,3290,3.27,0.54,1.02
+zona,Horizonte,3,Probable,2,12066,3.30,0.50,1.02
+zona,Horizonte,3,Inferido operacional,3,12821,2.42,0.44,1.01
+zona,MNG,4,Probado,1,3128,2.83,0.55,1.05
+zona,MNG,4,Probable,2,15785,2.56,0.48,1.02
+zona,MNG,4,Inferido operacional,3,17933,2.16,0.48,0.99
+metodo,CAF,1,Todas,0,68250,2.40,0.50,1.00
+metodo,SLS,2,Todas,0,25152,2.71,0.44,1.05`;
+  const store={inventario:d3.csvParse(csv),desglose:d3.csvParse(des),recurso:d3.csvParse(rec)}, draws=[], ons=[];
   window.dash={
     colors:['#2a78d6','#eb6834','#1baf7a','#eda100','#e87ba4','#008300','#6250d6','#e34948'],
     data:(id)=>({status:store[id]?'ok':'missing',data:store[id]||[]}),
@@ -283,88 +307,125 @@ Scarlet,4,Potencial,4,0.5,7188.37,1.5484,0.3975`;
 
   <section class="inv-kpis" aria-label="Indicadores">
     <div class="inv-card inv-kpi">
-      <p class="lbl">Probado + Probable (final)</p>
+      <p class="lbl">Probado + Probable</p>
       <p class="big"><span data-draw="kpi" data-fmt="t" data-source="resumen" data-where="grupo=pp" data-field="ton_f">—</span> t</p>
-      <p class="sub"><span data-draw="kpi" data-fmt="g" data-source="resumen" data-where="grupo=pp" data-field="ley_f">—</span> g/t · <span data-draw="kpi" data-fmt="oz" data-source="resumen" data-where="grupo=pp" data-field="onzas_f">—</span> oz</p>
+      <p class="sub"><span data-draw="kpi" data-fmt="g" data-source="resumen" data-where="grupo=pp" data-field="ley_f">—</span> g/t · ancho final <span data-draw="kpi" data-fmt="m" data-source="resumen" data-where="grupo=pp" data-field="ancho_f">—</span> m</p>
     </div>
     <div class="inv-card inv-kpi">
-      <p class="lbl">Inferido operacional (final)</p>
+      <p class="lbl">Inferido operacional</p>
       <p class="big"><span data-draw="kpi" data-fmt="t" data-source="resumen" data-where="grupo=inf" data-field="ton_f">—</span> t</p>
-      <p class="sub"><span data-draw="kpi" data-fmt="g" data-source="resumen" data-where="grupo=inf" data-field="ley_f">—</span> g/t · <span data-draw="kpi" data-fmt="oz" data-source="resumen" data-where="grupo=inf" data-field="onzas_f">—</span> oz</p>
+      <p class="sub"><span data-draw="kpi" data-fmt="g" data-source="resumen" data-where="grupo=inf" data-field="ley_f">—</span> g/t · ancho final <span data-draw="kpi" data-fmt="m" data-source="resumen" data-where="grupo=inf" data-field="ancho_f">—</span> m</p>
     </div>
     <div class="inv-card inv-kpi">
-      <p class="lbl">Total inventario final</p>
+      <p class="lbl">Total inventario</p>
       <p class="big"><span data-draw="kpi" data-fmt="t" data-source="resumen" data-where="grupo=total" data-field="ton_f">—</span> t</p>
-      <p class="sub"><span data-draw="kpi" data-fmt="g" data-source="resumen" data-where="grupo=total" data-field="ley_f">—</span> g/t · <span data-draw="kpi" data-fmt="oz" data-source="resumen" data-where="grupo=total" data-field="onzas_f">—</span> oz</p>
+      <p class="sub"><span data-draw="kpi" data-fmt="g" data-source="resumen" data-where="grupo=total" data-field="ley_f">—</span> g/t · ancho final <span data-draw="kpi" data-fmt="m" data-source="resumen" data-where="grupo=total" data-field="ancho_f">—</span> m</p>
     </div>
     <div class="inv-card inv-kpi">
-      <p class="lbl">Ancho geo / diluido / final (m)</p>
-      <p class="big"><span data-draw="kpi" data-fmt="m" data-source="resumen" data-where="grupo=total" data-field="ancho_geo">—</span> / <span data-draw="kpi" data-fmt="m" data-source="resumen" data-where="grupo=total" data-field="ancho_dil">—</span> / <span data-draw="kpi" data-fmt="m" data-source="resumen" data-where="grupo=total" data-field="ancho_f">—</span></p>
-      <p class="sub">In situ diluido: <span data-draw="kpi" data-fmt="t" data-source="resumen" data-where="grupo=total" data-field="toneladas">—</span> t a <span data-draw="kpi" data-fmt="g" data-source="resumen" data-where="grupo=total" data-field="ley_au">—</span> g/t</p>
+      <p class="lbl">Ancho geológico / final (m)</p>
+      <p class="big"><span data-draw="kpi" data-fmt="m" data-source="resumen" data-where="grupo=total" data-field="ancho_geo">—</span> / <span data-draw="kpi" data-fmt="m" data-source="resumen" data-where="grupo=total" data-field="ancho_f">—</span></p>
+      <p class="sub">Ponderados por tonelaje</p>
     </div>
   </section>
 
-  <section class="inv-card" id="tabla">
-    <h2>Detalle del inventario</h2>
-    <p class="note">In situ diluido y final por categoría. Leyes y anchos del total ponderados por tonelaje.</p>
+  <section class="inv-grid">
+    <div class="inv-card" id="tabla">
+      <h2>Por categoría</h2>
+      <p class="note">Ley y anchos del total ponderados por tonelaje.</p>
+      <div class="inv-table-wrap">
+        <table class="inv-table" data-source="detalle" data-row-key="categoria">
+          <thead><tr>
+            <th data-field="categoria">Categoría</th>
+            <th data-field="ton_f">Toneladas</th>
+            <th data-field="ley_f">Ley Au (g/t)</th>
+            <th data-field="ancho_geo">Ancho geo (m)</th>
+            <th data-field="ancho_f">Ancho final (m)</th>
+          </tr></thead>
+          <tbody data-draw="tabla"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="inv-card" id="metodo">
+      <h2>Por método de minado</h2>
+      <p class="note">SLS: MMW 0.80 · ELOS 0.20 m. CAF: MMW 1.00 · ELOS 0 m.</p>
+      <div class="inv-table-wrap">
+        <table class="inv-table" data-source="res_metodo" data-row-key="grupo">
+          <thead><tr>
+            <th data-field="grupo">Método</th>
+            <th data-field="ton_f">Toneladas</th>
+            <th data-field="ley_f">Ley Au (g/t)</th>
+            <th data-field="ancho_geo">Ancho geo (m)</th>
+            <th data-field="ancho_f">Ancho final (m)</th>
+          </tr></thead>
+          <tbody data-draw="tabla_met"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="inv-card" id="por-veta">
+    <h2>Por veta y categoría</h2>
+    <p class="note">Subtotales y total ponderados por tonelaje.</p>
     <div class="inv-table-wrap">
-      <table class="inv-table" data-source="detalle" data-row-key="categoria">
+      <table class="inv-table txt2" data-source="res_veta" data-row-key="grupo,categoria">
         <thead><tr>
+          <th data-field="grupo">Veta</th>
           <th data-field="categoria">Categoría</th>
-          <th data-field="toneladas">Toneladas</th>
-          <th data-field="ley_au">Ley (g/t)</th>
+          <th data-field="ton_f">Toneladas</th>
+          <th data-field="ley_f">Ley Au (g/t)</th>
           <th data-field="ancho_geo">Ancho geo (m)</th>
-          <th data-field="ancho_dil">Ancho dil (m)</th>
-          <th data-field="ton_f">Ton final</th>
-          <th data-field="ley_f">Ley final (g/t)</th>
           <th data-field="ancho_f">Ancho final (m)</th>
         </tr></thead>
-        <tbody data-draw="tabla2"></tbody>
+        <tbody data-draw="tabla_veta"></tbody>
       </table>
     </div>
-    <h3 class="inv-sub">Oro contenido del inventario final</h3>
-    <p class="note">Onzas troy in situ = Ton final × Ley final ÷ 31.1035.</p>
+  </section>
+
+  <section class="inv-card" id="por-zona">
+    <h2>Por zona y categoría</h2>
+    <p class="note">Subtotales y total ponderados por tonelaje.</p>
     <div class="inv-table-wrap">
-      <table class="inv-table" data-source="detalle" data-row-key="categoria">
+      <table class="inv-table txt2" data-source="res_zona" data-row-key="grupo,categoria">
         <thead><tr>
+          <th data-field="grupo">Zona</th>
           <th data-field="categoria">Categoría</th>
-          <th data-field="ton_f">Ton final</th>
-          <th data-field="ley_f">Ley final (g/t)</th>
-          <th data-field="au_g_f">Gramos Au</th>
-          <th data-field="onzas_f">Onzas</th>
+          <th data-field="ton_f">Toneladas</th>
+          <th data-field="ley_f">Ley Au (g/t)</th>
+          <th data-field="ancho_geo">Ancho geo (m)</th>
+          <th data-field="ancho_f">Ancho final (m)</th>
         </tr></thead>
-        <tbody data-draw="tabla"></tbody>
+        <tbody data-draw="tabla_zona"></tbody>
       </table>
     </div>
   </section>
 
   <section class="inv-grid">
-    <div class="inv-card" id="tonelaje">
-      <h2>Tonelaje in situ vs final</h2>
-      <p class="note">Toneladas por categoría.</p>
-      <div class="inv-legend"><span><i style="background:#B4B2A9"></i>In situ diluido</span><span><i class="sw-geo"></i>Final</span></div>
-      <div class="inv-chart" data-draw="ch_t" data-source="detalle"></div>
+    <div class="inv-card" id="ch-veta">
+      <h2>Toneladas por veta</h2>
+      <p class="note">Por categoría.</p>
+      <div class="inv-legend"><span><i style="background:#0C447C"></i>Probado</span><span><i style="background:#378ADD"></i>Probable</span><span><i style="background:#B4B2A9"></i>Inferido operacional</span></div>
+      <div class="inv-chart" data-draw="ch_veta" data-source="res_veta"></div>
+    </div>
+    <div class="inv-card" id="ch-zona">
+      <h2>Toneladas por zona</h2>
+      <p class="note">Por categoría.</p>
+      <div class="inv-legend"><span><i style="background:#0C447C"></i>Probado</span><span><i style="background:#378ADD"></i>Probable</span><span><i style="background:#B4B2A9"></i>Inferido operacional</span></div>
+      <div class="inv-chart" data-draw="ch_zona" data-source="res_zona"></div>
     </div>
     <div class="inv-card" id="ley">
-      <h2>Ley in situ vs final</h2>
-      <p class="note">g/t Au por categoría.</p>
-      <div class="inv-legend"><span><i style="background:#B4B2A9"></i>In situ diluido</span><span><i class="sw-geo"></i>Final</span></div>
+      <h2>Ley Au por categoría</h2>
+      <p class="note">g/t. En gris, la categoría de menor confianza.</p>
       <div class="inv-chart" data-draw="ch_ley" data-source="detalle"></div>
     </div>
-    <div class="inv-card" id="onzas">
-      <h2>Oro contenido final</h2>
-      <p class="note">Onzas troy del inventario final por categoría.</p>
-      <div class="inv-chart" data-draw="ch_oz" data-source="detalle"></div>
-    </div>
     <div class="inv-card" id="anchos">
-      <h2>Anchos geológico, diluido y final</h2>
+      <h2>Ancho geológico vs final</h2>
       <p class="note">Metros por categoría.</p>
-      <div class="inv-legend"><span><i class="sw-geo"></i>Geológico</span><span><i class="hatch sw-dil"></i>Diluido</span><span><i style="background:#1baf7a"></i>Final</span></div>
+      <div class="inv-legend"><span><i class="sw-geo"></i>Geológico</span><span><i style="background:#1baf7a"></i>Final</span></div>
       <div class="inv-chart" data-draw="ch_anch" data-source="detalle"></div>
     </div>
   </section>
 
-  <p class="inv-foot">SLS = sublevel stoping; CAF = corte y relleno ascendente. Onzas contenidas in situ, sin recuperación metalúrgica. Bajo JORC y NI 43-101 el inferido no se suma a las reservas; aquí se muestra por separado y en el total del inventario de minado.</p>
+  <p class="inv-foot">SLS = sublevel stoping; CAF = corte y relleno ascendente. Toneladas, ley y ancho son los valores finales (Ton f, Aufinal, Anch_f), con mining recovery de 95 %. Bajo JORC y NI 43-101 el inferido no se suma a las reservas; aquí se muestra por separado y en el total del inventario de minado.</p>
   </section>
   <footer class="inv-footer">
     <span>Developed by <b>Henry Contreras</b></span>
@@ -415,6 +476,69 @@ dash.calc('resumen', {
       agg('inf', cats.filter((d) => d.categoria === 'Inferido operacional')),
       agg('total', cats)
     ];
+  }
+});
+
+dash.calc('res_veta', {
+  title: 'Reservas por veta',
+  description: 'Toneladas, ley final y anchos geológico y final de cada veta por categoría, con subtotal por veta y total; ley y anchos ponderados por tonelaje.',
+  inputs: ['desglose'],
+  fn: (desglose) => {
+    const rows = desglose.filter((d) => d.tipo === 'veta')
+      .map((d) => ({ grupo: d.grupo, og: +d.orden_grupo, categoria: d.categoria, oc: +d.orden_cat, ton_f: +d.ton_f, ley_f: +d.ley_f, ancho_geo: +d.ancho_geo, ancho_f: +d.ancho_f }))
+      .sort((a, b) => a.og - b.og || a.oc - b.oc);
+    const agg = (grupo, categoria, rs) => {
+      const t = rs.reduce((s, d) => s + d.ton_f, 0);
+      const w = (f) => rs.reduce((s, d) => s + d.ton_f * d[f], 0) / t;
+      return { grupo, categoria, ton_f: t, ley_f: w('ley_f'), ancho_geo: w('ancho_geo'), ancho_f: w('ancho_f') };
+    };
+    const out = [];
+    [...new Set(rows.map((d) => d.grupo))].forEach((g) => {
+      const rs = rows.filter((d) => d.grupo === g);
+      rs.forEach((d) => out.push({ grupo: d.grupo, categoria: d.categoria, ton_f: d.ton_f, ley_f: d.ley_f, ancho_geo: d.ancho_geo, ancho_f: d.ancho_f }));
+      out.push(agg(g, 'Subtotal', rs));
+    });
+    out.push(agg('Total', 'Total', rows));
+    return out;
+  }
+});
+
+dash.calc('res_zona', {
+  title: 'Reservas por zona',
+  description: 'Toneladas, ley final y anchos geológico y final de cada zona por categoría, con subtotal por zona y total; ley y anchos ponderados por tonelaje.',
+  inputs: ['desglose'],
+  fn: (desglose) => {
+    const rows = desglose.filter((d) => d.tipo === 'zona')
+      .map((d) => ({ grupo: d.grupo, og: +d.orden_grupo, categoria: d.categoria, oc: +d.orden_cat, ton_f: +d.ton_f, ley_f: +d.ley_f, ancho_geo: +d.ancho_geo, ancho_f: +d.ancho_f }))
+      .sort((a, b) => a.og - b.og || a.oc - b.oc);
+    const agg = (grupo, categoria, rs) => {
+      const t = rs.reduce((s, d) => s + d.ton_f, 0);
+      const w = (f) => rs.reduce((s, d) => s + d.ton_f * d[f], 0) / t;
+      return { grupo, categoria, ton_f: t, ley_f: w('ley_f'), ancho_geo: w('ancho_geo'), ancho_f: w('ancho_f') };
+    };
+    const out = [];
+    [...new Set(rows.map((d) => d.grupo))].forEach((g) => {
+      const rs = rows.filter((d) => d.grupo === g);
+      rs.forEach((d) => out.push({ grupo: d.grupo, categoria: d.categoria, ton_f: d.ton_f, ley_f: d.ley_f, ancho_geo: d.ancho_geo, ancho_f: d.ancho_f }));
+      out.push(agg(g, 'Subtotal', rs));
+    });
+    out.push(agg('Total', 'Total', rows));
+    return out;
+  }
+});
+
+dash.calc('res_metodo', {
+  title: 'Reservas por método',
+  description: 'Toneladas, ley final y anchos geológico y final por método de minado (CAF, SLS) y total ponderado por tonelaje.',
+  inputs: ['desglose'],
+  fn: (desglose) => {
+    const rows = desglose.filter((d) => d.tipo === 'metodo')
+      .map((d) => ({ grupo: d.grupo, og: +d.orden_grupo, ton_f: +d.ton_f, ley_f: +d.ley_f, ancho_geo: +d.ancho_geo, ancho_f: +d.ancho_f }))
+      .sort((a, b) => a.og - b.og);
+    const t = rows.reduce((s, d) => s + d.ton_f, 0);
+    const w = (f) => rows.reduce((s, d) => s + d.ton_f * d[f], 0) / t;
+    return [...rows.map((d) => ({ grupo: d.grupo, ton_f: d.ton_f, ley_f: d.ley_f, ancho_geo: d.ancho_geo, ancho_f: d.ancho_f })),
+      { grupo: 'Total', ton_f: t, ley_f: w('ley_f'), ancho_geo: w('ancho_geo'), ancho_f: w('ancho_f') }];
   }
 });
 
@@ -520,42 +644,50 @@ window.invBar = function (el, rows, o) {
 
 const invColor = (c) => (c.r.categoria === 'Inferido operacional' ? 'var(--cds-chart-muted)' : dash.colors[0]);
 const invRows = (el) => { const d = invState(el, 'detalle'); return d ? d.filter((r) => r.categoria !== 'Total') : null; };
-const invPair = (c) => (c.si === 0 ? 'var(--cds-chart-muted)' : dash.colors[0]);
+const RES_CATS = [['Probado', '#0C447C'], ['Probable', '#378ADD'], ['Inferido operacional', 'var(--cds-chart-muted)']];
 
-dash.draw('ch_t', (el) => {
-  const rows = invRows(el); if (!rows) return;
-  invBar(el, rows, { aria: 'Tonelaje in situ y final por categoría', series: [{ f: 'toneladas', name: 'In situ' }, { f: 'ton_f', name: 'Final' }], color: invPair, fmt: (v) => d3.format('.3~s')(v).replace('k', ' k'), unit: ' t', tick: d3.format('~s') });
-});
 dash.draw('ch_ley', (el) => {
   const rows = invRows(el); if (!rows) return;
-  invBar(el, rows, { aria: 'Ley in situ y final por categoría', series: [{ f: 'ley_au', name: 'In situ' }, { f: 'ley_f', name: 'Final' }], color: invPair, fmt: FMT.g, unit: ' g/t', tick: d3.format('.0f') });
-});
-dash.draw('ch_oz', (el) => {
-  const rows = invRows(el); if (!rows) return;
-  invBar(el, rows, { aria: 'Onzas finales por categoría', series: [{ f: 'onzas_f', name: 'Au final' }], color: invColor, fmt: FMT.oz, unit: ' oz', tick: d3.format('~s') });
+  invBar(el, rows, { aria: 'Ley Au final por categoría', series: [{ f: 'ley_f', name: 'Ley Au' }], color: invColor, fmt: FMT.g, unit: ' g/t', tick: d3.format('.1f') });
 });
 dash.draw('ch_anch', (el) => {
   const rows = invRows(el); if (!rows) return;
   invBar(el, rows, {
-    aria: 'Anchos geológico, diluido y final por categoría', hatch: true,
-    series: [{ f: 'ancho_geo', name: 'Geológico' }, { f: 'ancho_dil', name: 'Diluido' }, { f: 'ancho_f', name: 'Final' }],
-    color: (c) => (c.si === 0 ? dash.colors[0] : c.si === 1 ? 'url(#inv-hatch)' : dash.colors[2]), fmt: FMT.m, unit: ' m', tick: d3.format('.1f')
+    aria: 'Ancho geológico y final por categoría',
+    series: [{ f: 'ancho_geo', name: 'Geológico' }, { f: 'ancho_f', name: 'Final' }],
+    color: (c) => (c.si === 0 ? dash.colors[0] : dash.colors[2]), fmt: FMT.m, unit: ' m', tick: d3.format('.1f')
   });
 });
+window.invResStack = (el, id, aria) => {
+  const d = invState(el, id); if (!d) return;
+  const groups = [...new Set(d.filter((r) => r.categoria !== 'Subtotal' && r.grupo !== 'Total').map((r) => r.grupo))];
+  const rows = groups.map((g) => {
+    const o = { veta: g };
+    RES_CATS.forEach(([c], i) => { const r = d.find((x) => x.grupo === g && x.categoria === c); o['c' + i] = r ? r.ton_f : 0; });
+    return o;
+  });
+  invStack(el, rows, { aria, series: RES_CATS.map(([c, col], i) => ({ f: 'c' + i, name: c, color: col })), fmt: FMT.t, unit: ' t', tick: d3.format('~s') });
+};
+dash.draw('ch_veta', (el) => invResStack(el, 'res_veta', 'Toneladas por veta y categoría'));
+dash.draw('ch_zona', (el) => invResStack(el, 'res_zona', 'Toneladas por zona y categoría'));
 
-window.invTable = (tb, cols) => {
-  const d = dash.data('detalle');
+window.invTable = (tb, id, cols) => {
+  const d = dash.data(id);
   tb.replaceChildren();
   if (d.status !== 'ok') return;
   d.data.forEach((r) => {
     const tr = document.createElement('tr');
-    if (r.categoria === 'Total') tr.className = 'tot';
+    if (r.grupo === 'Total' || r.categoria === 'Total') tr.className = 'tot';
+    else if (r.categoria === 'Subtotal') tr.className = 'sub';
     cols.forEach(([f, fmt]) => { const td = document.createElement('td'); td.textContent = fmt(r[f]); tr.appendChild(td); });
     tb.appendChild(tr);
   });
 };
-dash.draw('tabla2', (tb) => invTable(tb, [['categoria', (v) => v], ['toneladas', FMT.t], ['ley_au', FMT.g], ['ancho_geo', FMT.m], ['ancho_dil', FMT.m], ['ton_f', FMT.t], ['ley_f', FMT.g], ['ancho_f', FMT.m]]));
-dash.draw('tabla', (tb) => invTable(tb, [['categoria', (v) => v], ['ton_f', FMT.t], ['ley_f', FMT.g], ['au_g_f', FMT.gr], ['onzas_f', FMT.oz]]));
+const RES_COLS = [['ton_f', FMT.t], ['ley_f', FMT.g], ['ancho_geo', FMT.m], ['ancho_f', FMT.m]];
+dash.draw('tabla', (tb) => invTable(tb, 'detalle', [['categoria', (v) => v], ...RES_COLS]));
+dash.draw('tabla_met', (tb) => invTable(tb, 'res_metodo', [['grupo', (v) => v], ...RES_COLS]));
+dash.draw('tabla_veta', (tb) => invTable(tb, 'res_veta', [['grupo', (v) => v], ['categoria', (v) => (v === 'Total' ? '' : v)], ...RES_COLS]));
+dash.draw('tabla_zona', (tb) => invTable(tb, 'res_zona', [['grupo', (v) => v], ['categoria', (v) => (v === 'Total' ? '' : v)], ...RES_COLS]));
 
 const REC_CATS = ['Medido', 'Indicado', 'Inferido'];
 const REC_COL = { Medido: '#0C447C', Indicado: '#378ADD', Inferido: '#85B7EB', Potencial: 'var(--cds-chart-muted)' };
