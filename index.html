@@ -27,6 +27,13 @@
 body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:var(--font-anthropic-sans)}
 #dash-root{max-width:1200px;margin:0 auto;padding:24px 16px}
 @media print{.inv-chart{break-inside:avoid}}
+.inv-plist h2 { margin: 0 0 var(--cds-gap-sm); }
+.inv-plist dl { margin: 0; display: flex; flex-direction: column; }
+.inv-plist dl > div { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: var(--cds-gap-md); padding: var(--cds-pad-sm) 0; border-bottom: 1px solid var(--color-border-line); }
+.inv-plist dl > div:last-child { border-bottom: 0; }
+.inv-plist dt { color: var(--color-fg-muted); font-size: var(--cds-font-size-body); }
+.inv-plist dd { margin: 0; font-weight: var(--cds-font-weight-medium); font-variant-numeric: tabular-nums; }
+@media (max-width: 520px) { .inv-plist dl > div { grid-template-columns: 1fr; gap: 2px; } }
 </style>
 <script>
 (function(){
@@ -296,33 +303,37 @@ metodo,SLS,2,Todas,0,25152,2.71,0.44,1.05`;
     <p>Inventario final de <b data-draw="kpi" data-fmt="t" data-source="resumen" data-where="grupo=total" data-field="ton_f">—</b> t a <b data-draw="kpi" data-fmt="g" data-source="resumen" data-where="grupo=total" data-field="ley_f">—</b> g/t Au en las vetas Pierina Piso, Centro y Techo; Probado + Probable aporta <b data-draw="kpi" data-fmt="t" data-source="resumen" data-where="grupo=pp" data-field="ton_f">—</b> t a <b data-draw="kpi" data-fmt="g" data-source="resumen" data-where="grupo=pp" data-field="ley_f">—</b> g/t.</p>
   </header>
 
-  <section class="inv-params" aria-label="Parámetros de estimación">
-    <div><span class="k">Cut-off</span><span class="v">1.81 g/t</span></div>
-    <div><span class="k">SLS</span><span class="v">MMW 0.80 · ELOS 0.20 m</span></div>
-    <div><span class="k">CAF</span><span class="v">MMW 1.00 · ELOS 0 m</span></div>
-    <div><span class="k">Mining recovery</span><span class="v">95 %</span></div>
-    <div><span class="k">Densidad (SG)</span><span class="v">2.75 t/m³</span></div>
-    <div><span class="k">Vetas</span><span class="v">Pierina Piso, Centro, Techo</span></div>
+  <section class="inv-card inv-plist" aria-label="Parámetros de estimación">
+    <h2>Parámetros de estimación</h2>
+    <dl>
+      <div><dt>Cut-off (Ley de corte)</dt><dd>1.81 g/t</dd></div>
+      <div><dt>MMW (Minimum Mining Width – Ancho mínimo de minado)</dt><dd>SLS 0.80 m · CAF 1.00 m</dd></div>
+      <div><dt>ELOS (Equivalent Linear Overbreak/Slough – Sobre-excavación)</dt><dd>SLS 0.20 m · CAF 0 m</dd></div>
+      <div><dt>Métodos de minado</dt><dd>SLS (Sublevel Stoping) · CAF (Corte y Relleno Ascendente)</dd></div>
+      <div><dt>Mining recovery (Recuperación de minado)</dt><dd>95 %</dd></div>
+      <div><dt>SG (Specific Gravity – Densidad)</dt><dd>2.75 t/m³</dd></div>
+      <div><dt>Vetas</dt><dd>Pierina Piso · Pierina Centro · Pierina Techo</dd></div>
+    </dl>
   </section>
 
   <section class="inv-kpis" aria-label="Indicadores">
     <div class="inv-card inv-kpi">
       <p class="lbl">Probado + Probable</p>
       <p class="big"><span data-draw="kpi" data-fmt="t" data-source="resumen" data-where="grupo=pp" data-field="ton_f">—</span> t</p>
-      <p class="sub"><span data-draw="kpi" data-fmt="g" data-source="resumen" data-where="grupo=pp" data-field="ley_f">—</span> g/t · ancho final <span data-draw="kpi" data-fmt="m" data-source="resumen" data-where="grupo=pp" data-field="ancho_f">—</span> m</p>
+      <p class="sub"><span data-draw="kpi" data-fmt="g" data-source="resumen" data-where="grupo=pp" data-field="ley_f">—</span> g/t · ancho dil <span data-draw="kpi" data-fmt="m" data-source="resumen" data-where="grupo=pp" data-field="ancho_f">—</span> m</p>
     </div>
     <div class="inv-card inv-kpi">
       <p class="lbl">Inferido operacional</p>
       <p class="big"><span data-draw="kpi" data-fmt="t" data-source="resumen" data-where="grupo=inf" data-field="ton_f">—</span> t</p>
-      <p class="sub"><span data-draw="kpi" data-fmt="g" data-source="resumen" data-where="grupo=inf" data-field="ley_f">—</span> g/t · ancho final <span data-draw="kpi" data-fmt="m" data-source="resumen" data-where="grupo=inf" data-field="ancho_f">—</span> m</p>
+      <p class="sub"><span data-draw="kpi" data-fmt="g" data-source="resumen" data-where="grupo=inf" data-field="ley_f">—</span> g/t · ancho dil <span data-draw="kpi" data-fmt="m" data-source="resumen" data-where="grupo=inf" data-field="ancho_f">—</span> m</p>
     </div>
     <div class="inv-card inv-kpi">
       <p class="lbl">Total inventario</p>
       <p class="big"><span data-draw="kpi" data-fmt="t" data-source="resumen" data-where="grupo=total" data-field="ton_f">—</span> t</p>
-      <p class="sub"><span data-draw="kpi" data-fmt="g" data-source="resumen" data-where="grupo=total" data-field="ley_f">—</span> g/t · ancho final <span data-draw="kpi" data-fmt="m" data-source="resumen" data-where="grupo=total" data-field="ancho_f">—</span> m</p>
+      <p class="sub"><span data-draw="kpi" data-fmt="g" data-source="resumen" data-where="grupo=total" data-field="ley_f">—</span> g/t · ancho dil <span data-draw="kpi" data-fmt="m" data-source="resumen" data-where="grupo=total" data-field="ancho_f">—</span> m</p>
     </div>
     <div class="inv-card inv-kpi">
-      <p class="lbl">Ancho geológico / final (m)</p>
+      <p class="lbl">Ancho geológico / diluido (m)</p>
       <p class="big"><span data-draw="kpi" data-fmt="m" data-source="resumen" data-where="grupo=total" data-field="ancho_geo">—</span> / <span data-draw="kpi" data-fmt="m" data-source="resumen" data-where="grupo=total" data-field="ancho_f">—</span></p>
       <p class="sub">Ponderados por tonelaje</p>
     </div>
@@ -339,7 +350,7 @@ metodo,SLS,2,Todas,0,25152,2.71,0.44,1.05`;
             <th data-field="ton_f">Toneladas</th>
             <th data-field="ley_f">Ley Au (g/t)</th>
             <th data-field="ancho_geo">Ancho geo (m)</th>
-            <th data-field="ancho_f">Ancho final (m)</th>
+            <th data-field="ancho_f">Ancho dil (m)</th>
           </tr></thead>
           <tbody data-draw="tabla"></tbody>
         </table>
@@ -355,7 +366,7 @@ metodo,SLS,2,Todas,0,25152,2.71,0.44,1.05`;
             <th data-field="ton_f">Toneladas</th>
             <th data-field="ley_f">Ley Au (g/t)</th>
             <th data-field="ancho_geo">Ancho geo (m)</th>
-            <th data-field="ancho_f">Ancho final (m)</th>
+            <th data-field="ancho_f">Ancho dil (m)</th>
           </tr></thead>
           <tbody data-draw="tabla_met"></tbody>
         </table>
@@ -374,7 +385,7 @@ metodo,SLS,2,Todas,0,25152,2.71,0.44,1.05`;
           <th data-field="ton_f">Toneladas</th>
           <th data-field="ley_f">Ley Au (g/t)</th>
           <th data-field="ancho_geo">Ancho geo (m)</th>
-          <th data-field="ancho_f">Ancho final (m)</th>
+          <th data-field="ancho_f">Ancho dil (m)</th>
         </tr></thead>
         <tbody data-draw="tabla_veta"></tbody>
       </table>
@@ -392,7 +403,7 @@ metodo,SLS,2,Todas,0,25152,2.71,0.44,1.05`;
           <th data-field="ton_f">Toneladas</th>
           <th data-field="ley_f">Ley Au (g/t)</th>
           <th data-field="ancho_geo">Ancho geo (m)</th>
-          <th data-field="ancho_f">Ancho final (m)</th>
+          <th data-field="ancho_f">Ancho dil (m)</th>
         </tr></thead>
         <tbody data-draw="tabla_zona"></tbody>
       </table>
@@ -418,14 +429,14 @@ metodo,SLS,2,Todas,0,25152,2.71,0.44,1.05`;
       <div class="inv-chart" data-draw="ch_ley" data-source="detalle"></div>
     </div>
     <div class="inv-card" id="anchos">
-      <h2>Ancho geológico vs final</h2>
+      <h2>Ancho geológico vs diluido</h2>
       <p class="note">Metros por categoría.</p>
-      <div class="inv-legend"><span><i class="sw-geo"></i>Geológico</span><span><i style="background:#1baf7a"></i>Final</span></div>
+      <div class="inv-legend"><span><i class="sw-geo"></i>Geológico</span><span><i style="background:#1baf7a"></i>Diluido</span></div>
       <div class="inv-chart" data-draw="ch_anch" data-source="detalle"></div>
     </div>
   </section>
 
-  <p class="inv-foot">SLS = sublevel stoping; CAF = corte y relleno ascendente. Toneladas, ley y ancho son los valores finales (Ton f, Aufinal, Anch_f), con mining recovery de 95 %. Bajo JORC y NI 43-101 el inferido no se suma a las reservas; aquí se muestra por separado y en el total del inventario de minado.</p>
+  <p class="inv-foot">SLS = sublevel stoping; CAF = corte y relleno ascendente. Toneladas, ley y ancho diluido son los valores finales (Ton f, Aufinal, Anch_f), con mining recovery de 95 %. Bajo JORC y NI 43-101 el inferido no se suma a las reservas; aquí se muestra por separado y en el total del inventario de minado.</p>
   </section>
   <footer class="inv-footer">
     <span>Developed by <b>Henry Contreras</b></span>
@@ -653,8 +664,8 @@ dash.draw('ch_ley', (el) => {
 dash.draw('ch_anch', (el) => {
   const rows = invRows(el); if (!rows) return;
   invBar(el, rows, {
-    aria: 'Ancho geológico y final por categoría',
-    series: [{ f: 'ancho_geo', name: 'Geológico' }, { f: 'ancho_f', name: 'Final' }],
+    aria: 'Ancho geológico y diluido por categoría',
+    series: [{ f: 'ancho_geo', name: 'Geológico' }, { f: 'ancho_f', name: 'Diluido' }],
     color: (c) => (c.si === 0 ? dash.colors[0] : dash.colors[2]), fmt: FMT.m, unit: ' m', tick: d3.format('.1f')
   });
 });
