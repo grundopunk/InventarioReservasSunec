@@ -575,18 +575,6 @@ metodo,SLS,2,Todas,0,25152,2.71,0.44,1.05`;
     </div>
   </section>
 
-  <section class="inv-card inv-review" id="bud-revision">
-    <h2>Revisión del cálculo</h2>
-    <ul>
-      <li class="ok"><b>Cuadra:</b> en todos los meses, las toneladas tratadas son la suma de los aportes de Shonte y Mina Esperanza. Los finos recuperados (t × ley × 93 %), las onzas y los finos comerciales (95 %) están bien calculados.</li>
-      <li class="warn"><b>Mineral producido que no entra a planta:</b> la producción de mina supera al aporte en <b data-draw="kpi" data-fmt="t" data-source="bud_obs" data-where="id=obs" data-field="stock_t">—</b> t (Shonte <b data-draw="kpi" data-fmt="t" data-source="bud_obs" data-where="id=obs" data-field="stock_sh">—</b> t, Esperanza <b data-draw="kpi" data-fmt="t" data-source="bud_obs" data-where="id=obs" data-field="stock_es">—</b> t). Es lo que la mina produce en los 6 días de parada. La fila "Stock pile propio" está vacía, así que ese mineral, unas <b data-draw="kpi" data-fmt="oz" data-source="bud_obs" data-where="id=obs" data-field="stock_oz">—</b> oz recuperables, no aparece en ningún lado.</li>
-      <li class="warn"><b>Unidades TMH y TMS:</b> la producción está en TMH (húmedas) y el aporte a planta en TMS (secas), pero en los meses sin parada valen lo mismo. Falta descontar la humedad, o las dos filas deberían tener la misma unidad.</li>
-      <li class="warn"><b>"Finos recuperados Shonte Quelle" incluye Mina Esperanza:</b> la fila se calcula con todo el tonelaje de planta, que desde julio incluye unas <b data-draw="kpi" data-fmt="oz" data-source="bud_obs" data-where="id=obs" data-field="esp_oz">—</b> oz de Mina Esperanza. Debería llamarse "Finos recuperados planta".</li>
-      <li class="minor"><b>Agosto:</b> con Shonte a 2.23 g/t y Esperanza a 2.20 g/t, la ley ponderada da 2.23; la hoja muestra 2.22. Es solo redondeo de la ley de Shonte y no cambia las onzas.</li>
-      <li class="minor"><b>Textos:</b> el encabezado dice "FACTORES PRODUCCIÓN 2026P" en un budget 2027, y "Produccion Mina Esperaza" debe decir "Producción Mina Esperanza".</li>
-    </ul>
-  </section>
-
   <p class="inv-foot">Fuente: hoja Budget SUNEC 2027. Finos en onzas troy (1 oz = 31.1035 g). Los totales pueden diferir en 1 oz de la suma de los meses por redondeo.</p>
   </section>
 
@@ -1059,19 +1047,6 @@ dash.calc('bud_tot', {
   }
 });
 
-dash.calc('bud_obs', {
-  title: 'Revisión del budget',
-  description: 'Mineral producido y no tratado (producción − aporte, por fuente) con sus onzas recuperables, y onzas de Mina Esperanza incluidas en los finos de planta.',
-  inputs: ['budget'],
-  fn: (budget) => {
-    const r = budget.map((d) => ({ psh: +d.prod_shonte, pes: +d.prod_esperanza, ash: +d.aporte_shonte, aes: +d.aporte_esperanza, lsh: +d.ley_shonte, les: +d.ley_esperanza || 0, rec: +d.recuperacion }));
-    const sum = (f) => r.reduce((s, d) => s + f(d), 0);
-    const ssh = sum((d) => d.psh - d.ash), ses = sum((d) => d.pes - d.aes);
-    const goz = sum((d) => ((d.psh - d.ash) * d.lsh + (d.pes - d.aes) * d.les) * d.rec);
-    return [{ id: 'obs', stock_sh: ssh, stock_es: ses, stock_t: ssh + ses, stock_oz: goz / 31.1035, esp_oz: sum((d) => d.aes * d.les * d.rec) / 31.1035 }];
-  }
-});
-
 dash.calc('bud_tabla', {
   title: 'Tabla del budget',
   description: 'Cada concepto del budget por mes con su total anual: toneladas y finos sumados (finos totales recalculados), leyes ponderadas por tonelaje y mineral a stock = producción − aporte.',
@@ -1127,6 +1102,55 @@ dash.draw('bud_tabla', (tb) => {
   });
 });
 
+window.invLine = function (el, rows, o) {
+  el.replaceChildren();
+  const W = Math.max(240, el.clientWidth || 320), H = 240, top = 26, bottom = 30;
+  const svg = d3.select(el).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`).attr('role', 'img').attr('aria-label', o.aria);
+  const vals = rows.map((r) => r[o.f]);
+  const lo = d3.min(vals), hi = d3.max(vals), pad = Math.max((hi - lo) * 0.35, 0.05);
+  const y = d3.scaleLinear([lo - pad, hi + pad], [H - bottom, top]).nice();
+  const ticks = y.ticks(4);
+  const probe = svg.append('text').attr('class', 'inv-tick');
+  let lw = 0;
+  ticks.forEach((t) => { probe.text(o.tick(t)); lw = Math.max(lw, probe.node().getComputedTextLength()); });
+  probe.remove();
+  const ml = lw + 12, mr = 14;
+  const x = d3.scalePoint(rows.map((r) => r.categoria), [ml + 8, W - mr - 8]);
+  const g = svg.append('g');
+  g.selectAll('line.grid').data(ticks).join('line').attr('class', 'grid')
+    .attr('x1', ml).attr('x2', W - mr).attr('y1', (t) => y(t)).attr('y2', (t) => y(t))
+    .attr('style', 'stroke:var(--cds-chart-grid);stroke-width:1');
+  g.selectAll('text.yt').data(ticks).join('text').attr('class', 'inv-tick yt')
+    .attr('x', ml - 8).attr('y', (t) => y(t)).attr('dy', '0.32em').attr('text-anchor', 'end').text((t) => o.tick(t));
+  g.selectAll('text.xl').data(rows).join('text').attr('class', 'inv-tick xl')
+    .attr('x', (r) => x(r.categoria)).attr('y', H - bottom + 18).attr('text-anchor', 'middle').text((r) => r.categoria);
+  g.append('path').datum(rows).attr('fill', 'none')
+    .attr('style', `stroke:${o.color};stroke-width:2;stroke-linejoin:round;stroke-linecap:round`)
+    .attr('d', d3.line((r) => x(r.categoria), (r) => y(r[o.f])));
+  const dots = g.selectAll('circle.pt').data(rows).join('circle').attr('class', 'pt')
+    .attr('cx', (r) => x(r.categoria)).attr('cy', (r) => y(r[o.f])).attr('r', 4)
+    .attr('style', `fill:${o.color};stroke:var(--color-panel);stroke-width:2`);
+  const labs = g.selectAll('text.inv-val').data(rows).join('text').attr('class', 'inv-val')
+    .attr('x', (r) => x(r.categoria)).attr('y', (r) => y(r[o.f]) - 10).attr('text-anchor', 'middle').text((r) => o.fmt(r[o.f]));
+  let crowd = false;
+  labs.each(function () { if (this.getComputedTextLength() > x.step() - 2) crowd = true; });
+  if (crowd) labs.remove();
+  const tip = document.createElement('div'); tip.className = 'inv-tip'; tip.hidden = true; el.appendChild(tip);
+  g.selectAll('rect.hit').data(rows).join('rect').attr('class', 'hit')
+    .attr('x', (r) => x(r.categoria) - x.step() / 2).attr('width', x.step()).attr('y', top).attr('height', H - bottom - top).attr('fill', 'transparent')
+    .on('pointerenter pointermove', function (ev, r) {
+      dots.attr('r', (d) => (d === r ? 6 : 4));
+      tip.replaceChildren();
+      const h = document.createElement('div'); h.className = 't'; h.textContent = r.categoria; tip.appendChild(h);
+      const l = document.createElement('div'); l.textContent = `${o.name}: ${o.fmt(r[o.f])}${o.unit}`; tip.appendChild(l);
+      tip.hidden = false;
+      const [px, py] = d3.pointer(ev, el);
+      tip.style.left = `${Math.max(0, Math.min(el.clientWidth - tip.offsetWidth, px + 12))}px`;
+      tip.style.top = `${Math.max(0, py - tip.offsetHeight - 8)}px`;
+    })
+    .on('pointerleave', () => { dots.attr('r', 4); tip.hidden = true; });
+};
+
 const budRows = (el) => {
   const d = invState(el, 'budget'); if (!d) return null;
   return d.map((r) => ({ ...r, categoria: r.mes, veta: r.mes, o: +r.orden, ton_planta: +r.ton_planta, ley_planta: +r.ley_planta, aporte_shonte: +r.aporte_shonte, aporte_esperanza: +r.aporte_esperanza, finos_com_oz: +r.finos_com_oz })).sort((a, b) => a.o - b.o);
@@ -1141,7 +1165,7 @@ dash.draw('ch_bud_oz', (el) => {
 });
 dash.draw('ch_bud_ley', (el) => {
   const rows = budRows(el); if (!rows) return;
-  invBar(el, rows, { aria: 'Ley de cabeza por mes', series: [{ f: 'ley_planta', name: 'Ley de cabeza' }], color: () => '#B09A3B', fmt: FMT.g, unit: ' g/t', tick: d3.format('.1f') });
+  invLine(el, rows, { aria: 'Ley de cabeza por mes', f: 'ley_planta', name: 'Ley de cabeza', color: '#B09A3B', fmt: FMT.g, unit: ' g/t', tick: d3.format('.2f') });
 });
 
 dash.calc('bud_resumen', {
