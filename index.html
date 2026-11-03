@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Inventario de recursos y reservas</title>
+<title>Inventario de recursos, reservas y budget 2027</title>
 <meta name="description" content="Inventario de reservas por categoría: Probado, Probable e Inferido operacional. Consorcio Minero SUNEC.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Consorcio Minero SUNEC">
@@ -35,6 +35,21 @@ body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:var(-
 .inv-plist dd { margin: 0; font-weight: var(--cds-font-weight-medium); font-variant-numeric: tabular-nums; }
 @media (max-width: 520px) { .inv-plist dl > div { grid-template-columns: 1fr; gap: 2px; } }
 .inv-map { display: block; width: 100%; height: auto; border-radius: calc(var(--cds-radius) - 2px); background: #ffffff; border: 1px solid var(--color-border-line); }
+.inv .inv-table.inv-bud { font-size: var(--cds-font-size-caption); }
+.inv .inv-bud th, .inv .inv-bud td { padding: 5px 5px; }
+.inv-bud th:first-child, .inv-bud td:first-child { position: sticky; left: 0; background: var(--color-panel); white-space: normal; min-width: 8rem; max-width: 9rem; z-index: 1; }
+.inv-bud th:nth-child(2), .inv-bud td:nth-child(2) { text-align: left; color: var(--color-fg-muted); }
+.inv-bud tr.b-main td { font-weight: var(--cds-font-weight-medium); }
+.inv-bud tr.b-sec td { color: var(--color-fg-muted); }
+.inv-bud tr.b-flag td { color: var(--color-warn); font-weight: var(--cds-font-weight-medium); }
+.inv-bud td:last-child, .inv-bud th:last-child { background: color-mix(in srgb, #B09A3B 12%, transparent); }
+.inv-review ul { margin: var(--cds-gap-sm) 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: var(--cds-gap-sm); }
+.inv-review li { position: relative; padding-left: 20px; line-height: 1.55; font-size: var(--cds-font-size-body); }
+.inv-review li::before { content: ""; position: absolute; left: 2px; top: .5em; width: 9px; height: 9px; border-radius: 50%; }
+.inv-review li.ok::before { background: var(--color-ok); }
+.inv-review li.warn::before { background: var(--color-warn); }
+.inv-review li.minor::before { background: var(--cds-chart-muted); }
+.inv-legend i.sw-esp { background: #eb6834; }
 </style>
 <script>
 (function(){
@@ -83,7 +98,20 @@ zona,MNG,4,Probable,2,15785,2.56,0.48,1.02
 zona,MNG,4,Inferido operacional,3,17933,2.16,0.48,0.99
 metodo,CAF,1,Todas,0,68250,2.40,0.50,1.00
 metodo,SLS,2,Todas,0,25152,2.71,0.44,1.05`;
-  const store={inventario:d3.csvParse(csv),desglose:d3.csvParse(des),recurso:d3.csvParse(rec)}, draws=[], ons=[];
+  const bud=`orden,mes,dias,parada,ton_planta,ley_planta,recuperacion,aporte_shonte,aporte_esperanza,prod_shonte,prod_esperanza,ley_shonte,ley_esperanza,finos_kg,finos_oz,finos_com_oz
+1,Ene,31,1,10500,2.15,0.93,10500,0,10850,0,2.15,,21,675,641
+2,Feb,28,0,9800,2.18,0.93,9800,0,9800,0,2.18,,20,639,607
+3,Mar,31,1,10500,2.21,0.93,10500,0,10850,0,2.21,,22,694,659
+4,Abr,30,0,10500,2.22,0.93,10500,0,10500,0,2.22,,22,697,662
+5,May,31,1,10500,2.18,0.93,10500,0,10850,0,2.18,,21,684,650
+6,Jun,30,0,10500,2.19,0.93,10500,0,10500,0,2.19,,21,688,653
+7,Jul,31,1,11250,2.24,0.93,10500,750,10850,775,2.24,2.2,23,753,715
+8,Ago,31,0,11625,2.22,0.93,10850,775,10850,775,2.23,2.2,24,773,734
+9,Set,30,1,11600,2.2,0.93,10150,1450,10500,1500,2.2,2.2,24,763,725
+10,Oct,31,0,12400,2.2,0.93,10850,1550,10850,1550,2.2,2.2,25,816,775
+11,Nov,30,1,13050,2.2,0.93,10150,2900,10500,3000,2.2,2.2,27,858,816
+12,Dic,31,0,13950,2.2,0.93,10850,3100,10850,3100,2.2,2.2,29,918,872`;
+  const store={budget:d3.csvParse(bud),inventario:d3.csvParse(csv),desglose:d3.csvParse(des),recurso:d3.csvParse(rec)}, draws=[], ons=[];
   window.dash={
     colors:['#2a78d6','#eb6834','#1baf7a','#eda100','#e87ba4','#008300','#6250d6','#e34948'],
     data:(id)=>({status:store[id]?'ok':'missing',data:store[id]||[]}),
@@ -173,6 +201,7 @@ metodo,SLS,2,Todas,0,25152,2.71,0.44,1.05`;
   <nav class="inv-tabs" role="tablist" aria-label="Inventarios">
     <button type="button" role="tab" data-tab="recursos" aria-selected="true">Inventario de recurso</button>
     <button type="button" role="tab" data-tab="reservas" aria-selected="false">Inventario de reservas</button>
+    <button type="button" role="tab" data-tab="budget" aria-selected="false">Budget 2027</button>
   </nav>
 
   <section class="inv-page" data-page="recursos" id="recursos">
@@ -445,6 +474,100 @@ metodo,SLS,2,Todas,0,25152,2.71,0.44,1.05`;
 
   <p class="inv-foot">SLS = sublevel stoping; CAF = corte y relleno ascendente. Toneladas, ley y ancho diluido son los valores finales (Ton f, Aufinal, Anch_f), con mining recovery de 95 %. Bajo JORC y NI 43-101 el inferido no se suma a las reservas; aquí se muestra por separado y en el total del inventario de minado.</p>
   </section>
+  <section class="inv-page" data-page="budget" id="budget" hidden>
+  <header class="inv-head">
+    <h1>Budget 2027</h1>
+    <p>La planta trata <b data-draw="kpi" data-fmt="t" data-source="bud_tot" data-where="id=tot" data-field="ton_planta">—</b> TMS a <b data-draw="kpi" data-fmt="g" data-source="bud_tot" data-where="id=tot" data-field="ley_planta">—</b> g/t con 93 % de recuperación: <b data-draw="kpi" data-fmt="oz" data-source="bud_tot" data-where="id=tot" data-field="finos_oz">—</b> oz recuperadas y <b data-draw="kpi" data-fmt="oz" data-source="bud_tot" data-where="id=tot" data-field="finos_com_oz">—</b> oz comerciales.</p>
+  </header>
+
+  <section class="inv-kpis" aria-label="Indicadores del budget">
+    <div class="inv-card inv-kpi">
+      <p class="lbl">Toneladas tratadas planta</p>
+      <p class="big"><span data-draw="kpi" data-fmt="t" data-source="bud_tot" data-where="id=tot" data-field="ton_planta">—</span> TMS</p>
+      <p class="sub">Shonte <span data-draw="kpi" data-fmt="t" data-source="bud_tot" data-where="id=tot" data-field="aporte_shonte">—</span> · Esperanza <span data-draw="kpi" data-fmt="t" data-source="bud_tot" data-where="id=tot" data-field="aporte_esperanza">—</span></p>
+    </div>
+    <div class="inv-card inv-kpi">
+      <p class="lbl">Ley de cabeza</p>
+      <p class="big"><span data-draw="kpi" data-fmt="g" data-source="bud_tot" data-where="id=tot" data-field="ley_planta">—</span> g/t</p>
+      <p class="sub">Ponderada por tonelaje tratado</p>
+    </div>
+    <div class="inv-card inv-kpi">
+      <p class="lbl">Finos recuperados</p>
+      <p class="big"><span data-draw="kpi" data-fmt="oz" data-source="bud_tot" data-where="id=tot" data-field="finos_oz">—</span> oz</p>
+      <p class="sub"><span data-draw="kpi" data-fmt="kg" data-source="bud_tot" data-where="id=tot" data-field="finos_kg">—</span> kg · recuperación 93 %</p>
+    </div>
+    <div class="inv-card inv-kpi">
+      <p class="lbl">Finos comerciales</p>
+      <p class="big"><span data-draw="kpi" data-fmt="oz" data-source="bud_tot" data-where="id=tot" data-field="finos_com_oz">—</span> oz</p>
+      <p class="sub">95 % de los finos recuperados</p>
+    </div>
+  </section>
+
+  <section class="inv-card inv-plist" aria-label="Supuestos del budget">
+    <h2>Supuestos</h2>
+    <dl>
+      <div><dt>Días de operación</dt><dd>365 días · 6 paradas de planta de 1 día (Ene, Mar, May, Jul, Set, Nov)</dd></div>
+      <div><dt>Ritmo Shonte Quelle</dt><dd>350 t/día</dd></div>
+      <div><dt>Ritmo Mina Esperanza</dt><dd>25 t/día (Jul–Ago) · 50 t/día (Set–Oct) · 100 t/día (Nov–Dic)</dd></div>
+      <div><dt>Recuperación metalúrgica</dt><dd>93 %</dd></div>
+      <div><dt>Factor comercial</dt><dd>95 % de los finos recuperados</dd></div>
+      <div><dt>Ley Mina Esperanza</dt><dd>2.20 g/t</dd></div>
+    </dl>
+  </section>
+
+  <section class="inv-card" id="bud-tabla">
+    <h2>Factores de producción 2027</h2>
+    <p class="note">Totales: toneladas sumadas; leyes ponderadas por tonelaje; finos totales calculados como toneladas × ley × recuperación.</p>
+    <div class="inv-table-wrap">
+      <table class="inv-table inv-bud" data-source="bud_tabla" data-row-key="concepto">
+        <thead><tr>
+          <th data-field="concepto">Concepto</th>
+          <th data-field="und">Und</th>
+          <th data-field="Ene">Ene</th><th data-field="Feb">Feb</th><th data-field="Mar">Mar</th><th data-field="Abr">Abr</th>
+          <th data-field="May">May</th><th data-field="Jun">Jun</th><th data-field="Jul">Jul</th><th data-field="Ago">Ago</th>
+          <th data-field="Set">Set</th><th data-field="Oct">Oct</th><th data-field="Nov">Nov</th><th data-field="Dic">Dic</th>
+          <th data-field="Total">Total</th>
+        </tr></thead>
+        <tbody data-draw="bud_tabla"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="inv-card" id="bud-alim">
+    <h2>Alimentación a planta por mes</h2>
+    <p class="note">TMS por fuente. Mina Esperanza entra desde julio.</p>
+    <div class="inv-legend"><span><i class="sw-geo"></i>Shonte Quelle</span><span><i class="sw-esp"></i>Mina Esperanza</span></div>
+    <div class="inv-chart" data-draw="ch_bud_alim" data-source="budget"></div>
+  </section>
+
+  <section class="inv-grid">
+    <div class="inv-card" id="bud-oz">
+      <h2>Finos comerciales por mes</h2>
+      <p class="note">Onzas troy.</p>
+      <div class="inv-chart" data-draw="ch_bud_oz" data-source="budget"></div>
+    </div>
+    <div class="inv-card" id="bud-ley">
+      <h2>Ley de cabeza por mes</h2>
+      <p class="note">g/t Au de la mezcla tratada en planta.</p>
+      <div class="inv-chart" data-draw="ch_bud_ley" data-source="budget"></div>
+    </div>
+  </section>
+
+  <section class="inv-card inv-review" id="bud-revision">
+    <h2>Revisión del cálculo</h2>
+    <ul>
+      <li class="ok"><b>Cuadra:</b> en todos los meses, las toneladas tratadas son la suma de los aportes de Shonte y Mina Esperanza. Los finos recuperados (t × ley × 93 %), las onzas y los finos comerciales (95 %) están bien calculados.</li>
+      <li class="warn"><b>Mineral producido que no entra a planta:</b> la producción de mina supera al aporte en <b data-draw="kpi" data-fmt="t" data-source="bud_obs" data-where="id=obs" data-field="stock_t">—</b> t (Shonte <b data-draw="kpi" data-fmt="t" data-source="bud_obs" data-where="id=obs" data-field="stock_sh">—</b> t, Esperanza <b data-draw="kpi" data-fmt="t" data-source="bud_obs" data-where="id=obs" data-field="stock_es">—</b> t). Es lo que la mina produce en los 6 días de parada. La fila "Stock pile propio" está vacía, así que ese mineral, unas <b data-draw="kpi" data-fmt="oz" data-source="bud_obs" data-where="id=obs" data-field="stock_oz">—</b> oz recuperables, no aparece en ningún lado.</li>
+      <li class="warn"><b>Unidades TMH y TMS:</b> la producción está en TMH (húmedas) y el aporte a planta en TMS (secas), pero en los meses sin parada valen lo mismo. Falta descontar la humedad, o las dos filas deberían tener la misma unidad.</li>
+      <li class="warn"><b>"Finos recuperados Shonte Quelle" incluye Mina Esperanza:</b> la fila se calcula con todo el tonelaje de planta, que desde julio incluye unas <b data-draw="kpi" data-fmt="oz" data-source="bud_obs" data-where="id=obs" data-field="esp_oz">—</b> oz de Mina Esperanza. Debería llamarse "Finos recuperados planta".</li>
+      <li class="minor"><b>Agosto:</b> con Shonte a 2.23 g/t y Esperanza a 2.20 g/t, la ley ponderada da 2.23; la hoja muestra 2.22. Es solo redondeo de la ley de Shonte y no cambia las onzas.</li>
+      <li class="minor"><b>Textos:</b> el encabezado dice "FACTORES PRODUCCIÓN 2026P" en un budget 2027, y "Produccion Mina Esperaza" debe decir "Producción Mina Esperanza".</li>
+    </ul>
+  </section>
+
+  <p class="inv-foot">Fuente: hoja Budget SUNEC 2027. Finos en onzas troy (1 oz = 31.1035 g). Los totales pueden diferir en 1 oz de la suma de los meses por redondeo.</p>
+  </section>
+
   <footer class="inv-footer">
     <span>Developed by <b>Henry Contreras</b></span>
     <span>Consorcio Minero SUNEC</span>
@@ -562,7 +685,7 @@ dash.calc('res_metodo', {
 
 const FMT = {
   t: d3.format(',.0f'), oz: d3.format(',.0f'), gr: d3.format(',.0f'),
-  g: d3.format('.2f'), m: d3.format('.2f'), x: d3.format('.1f')
+  g: d3.format('.2f'), m: d3.format('.2f'), x: d3.format('.1f'), kg: d3.format(',.1f')
 };
 
 function invState(el, id) {
@@ -631,6 +754,10 @@ window.invBar = function (el, rows, o) {
     let crowd = false;
     g.selectAll('text.inv-val').each(function () { if (this.getComputedTextLength() > xs.step() + 2) crowd = true; });
     if (crowd) g.selectAll('text.inv-val').attr('y', (c) => y(c.r[c.s.f]) - 6 - 13 * (ns - 1 - c.si));
+  } else {
+    let crowd = false;
+    g.selectAll('text.inv-val').each(function () { if (this.getComputedTextLength() > x.step() - 2) crowd = true; });
+    if (crowd) g.selectAll('text.inv-val').remove();
   }
   const lab = g.selectAll('text.xl').data(rows).join('text').attr('class', 'inv-tick xl')
     .attr('x', (r) => x(r.categoria) + x.bandwidth() / 2).attr('y', H - bottom + 16).attr('text-anchor', 'middle');
@@ -791,6 +918,7 @@ window.invStack = function (el, rows, o) {
     .attr('style', (d) => `fill:${d.s.color}`);
   g.selectAll('text.inv-val').data(rows).join('text').attr('class', 'inv-val')
     .attr('x', (r) => bx(r) + bw / 2).attr('y', (r) => y(tot(r)) - 6).attr('text-anchor', 'middle').text((r) => o.fmt(tot(r)));
+  { let crowd = false; g.selectAll('text.inv-val').each(function () { if (this.getComputedTextLength() > x.step() - 2) crowd = true; }); if (crowd) g.selectAll('text.inv-val').remove(); }
   const lab = g.selectAll('text.xl').data(rows).join('text').attr('class', 'inv-tick xl')
     .attr('x', (r) => x(r.veta) + x.bandwidth() / 2).attr('y', H - bottom + 16).attr('text-anchor', 'middle');
   lab.each(function (r) {
@@ -893,7 +1021,106 @@ const invTabs = (name) => {
 };
 document.querySelectorAll('.inv-tabs [data-tab]').forEach((b) => b.addEventListener('click', () => { invTabs(b.dataset.tab); dash.setLink(b.dataset.tab); }));
 const invStart = location.hash.slice(1);
-if (invStart === 'reservas' || invStart === 'recursos') invTabs(invStart);
+if (['reservas', 'recursos', 'budget'].includes(invStart)) invTabs(invStart);
+
+const BUD_M = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Set', 'Oct', 'Nov', 'Dic'];
+
+dash.calc('bud_tot', {
+  title: 'Totales del budget',
+  description: 'Totales anuales: toneladas sumadas, leyes ponderadas por tonelaje y finos = Σ toneladas × ley × recuperación (kg y oz troy); comerciales al 95 %.',
+  inputs: ['budget'],
+  fn: (budget) => {
+    const r = budget.map((d) => ({ ton: +d.ton_planta, ley: +d.ley_planta, rec: +d.recuperacion, ash: +d.aporte_shonte, aes: +d.aporte_esperanza }));
+    const sum = (f) => r.reduce((s, d) => s + f(d), 0);
+    const t = sum((d) => d.ton), g = sum((d) => d.ton * d.ley * d.rec);
+    return [{ id: 'tot', ton_planta: t, ley_planta: sum((d) => d.ton * d.ley) / t, aporte_shonte: sum((d) => d.ash), aporte_esperanza: sum((d) => d.aes), finos_kg: g / 1000, finos_oz: g / 31.1035, finos_com_oz: g / 31.1035 * 0.95 }];
+  }
+});
+
+dash.calc('bud_obs', {
+  title: 'Revisión del budget',
+  description: 'Mineral producido y no tratado (producción − aporte, por fuente) con sus onzas recuperables, y onzas de Mina Esperanza incluidas en los finos de planta.',
+  inputs: ['budget'],
+  fn: (budget) => {
+    const r = budget.map((d) => ({ psh: +d.prod_shonte, pes: +d.prod_esperanza, ash: +d.aporte_shonte, aes: +d.aporte_esperanza, lsh: +d.ley_shonte, les: +d.ley_esperanza || 0, rec: +d.recuperacion }));
+    const sum = (f) => r.reduce((s, d) => s + f(d), 0);
+    const ssh = sum((d) => d.psh - d.ash), ses = sum((d) => d.pes - d.aes);
+    const goz = sum((d) => ((d.psh - d.ash) * d.lsh + (d.pes - d.aes) * d.les) * d.rec);
+    return [{ id: 'obs', stock_sh: ssh, stock_es: ses, stock_t: ssh + ses, stock_oz: goz / 31.1035, esp_oz: sum((d) => d.aes * d.les * d.rec) / 31.1035 }];
+  }
+});
+
+dash.calc('bud_tabla', {
+  title: 'Tabla del budget',
+  description: 'Cada concepto del budget por mes con su total anual: toneladas y finos sumados (finos totales recalculados), leyes ponderadas por tonelaje y mineral a stock = producción − aporte.',
+  inputs: ['budget'],
+  fn: (budget) => {
+    const M = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Set', 'Oct', 'Nov', 'Dic'];
+    const r = budget.map((d) => ({ mes: d.mes, o: +d.orden, dias: +d.dias, par: +d.parada, ton: +d.ton_planta, ley: +d.ley_planta, rec: +d.recuperacion, ash: +d.aporte_shonte, aes: +d.aporte_esperanza, psh: +d.prod_shonte, pes: +d.prod_esperanza, lsh: +d.ley_shonte, les: d.ley_esperanza === '' ? null : +d.ley_esperanza, kg: +d.finos_kg, oz: +d.finos_oz, ozc: +d.finos_com_oz })).sort((a, b) => a.o - b.o);
+    const sum = (f) => r.reduce((s, d) => s + (f(d) || 0), 0);
+    const wavg = (v, w) => { const W = sum(w); return W ? sum((d) => (v(d) == null ? 0 : v(d) * w(d))) / W : null; };
+    const row = (concepto, und, fmt, tipo, f, total) => {
+      const o = { concepto, und, fmt, tipo };
+      r.forEach((d, i) => { o[M[i]] = f(d); });
+      o.Total = total;
+      return o;
+    };
+    const g = sum((d) => d.ton * d.ley * d.rec);
+    return [
+      row('Días', 'd', 'int', 'sec', (d) => d.dias, sum((d) => d.dias)),
+      row('Parada planta', 'd', 'int', 'sec', (d) => d.par || null, sum((d) => d.par)),
+      row('Toneladas tratadas planta', 'TMS', 't', 'main', (d) => d.ton, sum((d) => d.ton)),
+      row('Ley de cabeza', 'g/t', 'g', 'main', (d) => d.ley, wavg((d) => d.ley, (d) => d.ton)),
+      row('Recuperación', '%', 'pct', 'main', (d) => d.rec, wavg((d) => d.rec, (d) => d.ton)),
+      row('Aporte a planta Shonte', 'TMS', 't', '', (d) => d.ash, sum((d) => d.ash)),
+      row('Aporte a planta Mina Esperanza', 'TMS', 't', '', (d) => d.aes, sum((d) => d.aes)),
+      row('Producción Shonte Quelle', 'TMH', 't', 'main', (d) => d.psh, sum((d) => d.psh)),
+      row('Ley de cabeza Shonte Quelle', 'g/t', 'g', '', (d) => d.lsh, wavg((d) => d.lsh, (d) => d.psh)),
+      row('Producción Mina Esperanza', 'TMH', 't', 'main', (d) => d.pes, sum((d) => d.pes)),
+      row('Ley de cabeza Mina Esperanza', 'g/t', 'g', '', (d) => d.les, wavg((d) => d.les, (d) => (d.les == null ? 0 : d.pes))),
+      row('Mineral no tratado (producción − aporte)', 't', 't', 'flag', (d) => (d.psh + d.pes) - (d.ash + d.aes), sum((d) => (d.psh + d.pes) - (d.ash + d.aes))),
+      row('Finos recuperados', 'kg', 'kg', 'main', (d) => d.kg, g / 1000),
+      row('Finos recuperados planta', 'oz', 'int', '', (d) => d.oz, g / 31.1035),
+      row('Finos comerciales', 'oz', 'int', 'main', (d) => d.ozc, g / 31.1035 * 0.95)
+    ];
+  }
+});
+
+const BUD_FMT = { int: d3.format(',.0f'), t: d3.format(',.0f'), g: d3.format('.2f'), pct: d3.format('.0%'), kg: d3.format(',.1f') };
+dash.draw('bud_tabla', (tb) => {
+  const d = dash.data('bud_tabla');
+  tb.replaceChildren();
+  if (d.status !== 'ok') return;
+  d.data.forEach((r) => {
+    const tr = document.createElement('tr');
+    if (r.tipo) tr.className = 'b-' + r.tipo;
+    const f = BUD_FMT[r.fmt];
+    [['concepto', (v) => v], ['und', (v) => v], ...BUD_M.map((m) => [m, r.fmt === 'kg' ? BUD_FMT.int : f]), ['Total', f]].forEach(([k, fmt]) => {
+      const td = document.createElement('td');
+      const v = r[k];
+      td.textContent = v == null || v === '' ? '' : (r.fmt === 't' && v === 0 && k !== 'Total' ? '0' : fmt(v));
+      tr.appendChild(td);
+    });
+    tb.appendChild(tr);
+  });
+});
+
+const budRows = (el) => {
+  const d = invState(el, 'budget'); if (!d) return null;
+  return d.map((r) => ({ ...r, categoria: r.mes, veta: r.mes, o: +r.orden, ton_planta: +r.ton_planta, ley_planta: +r.ley_planta, aporte_shonte: +r.aporte_shonte, aporte_esperanza: +r.aporte_esperanza, finos_com_oz: +r.finos_com_oz })).sort((a, b) => a.o - b.o);
+};
+dash.draw('ch_bud_alim', (el) => {
+  const rows = budRows(el); if (!rows) return;
+  invStack(el, rows, { aria: 'Alimentación a planta por mes y fuente', series: [{ f: 'aporte_shonte', name: 'Shonte Quelle', color: dash.colors[0] }, { f: 'aporte_esperanza', name: 'Mina Esperanza', color: dash.colors[1] }], fmt: (v) => d3.format('.3~s')(v).replace('k', ' k'), unit: ' TMS', tick: d3.format('~s') });
+});
+dash.draw('ch_bud_oz', (el) => {
+  const rows = budRows(el); if (!rows) return;
+  invBar(el, rows, { aria: 'Finos comerciales por mes', series: [{ f: 'finos_com_oz', name: 'Finos comerciales' }], color: () => dash.colors[0], fmt: FMT.oz, unit: ' oz', tick: d3.format('~s') });
+});
+dash.draw('ch_bud_ley', (el) => {
+  const rows = budRows(el); if (!rows) return;
+  invBar(el, rows, { aria: 'Ley de cabeza por mes', series: [{ f: 'ley_planta', name: 'Ley de cabeza' }], color: () => '#B09A3B', fmt: FMT.g, unit: ' g/t', tick: d3.format('.1f') });
+});
 </script>
 
 </div></body></html>
