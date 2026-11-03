@@ -50,6 +50,9 @@ body{margin:0;background:var(--color-bg);color:var(--color-fg);font-family:var(-
 .inv-review li.warn::before { background: var(--color-warn); }
 .inv-review li.minor::before { background: var(--cds-chart-muted); }
 .inv-legend i.sw-esp { background: #eb6834; }
+.inv-bres th:nth-child(2), .inv-bres td:nth-child(2) { text-align: left; color: var(--color-fg-muted); }
+.inv-bres tr.b-main td { font-weight: var(--cds-font-weight-medium); }
+.inv-bres td:last-child, .inv-bres th:last-child { background: color-mix(in srgb, #B09A3B 12%, transparent); font-weight: var(--cds-font-weight-medium); }
 </style>
 <script>
 (function(){
@@ -500,6 +503,25 @@ metodo,SLS,2,Todas,0,25152,2.71,0.44,1.05`;
       <p class="lbl">Finos comerciales</p>
       <p class="big"><span data-draw="kpi" data-fmt="oz" data-source="bud_tot" data-where="id=tot" data-field="finos_com_oz">—</span> oz</p>
       <p class="sub">95 % de los finos recuperados</p>
+    </div>
+  </section>
+
+  <section class="inv-card" id="bud-resumen">
+    <h2>Resumen del budget 2027</h2>
+    <p class="note">Por trimestre y total anual. Leyes ponderadas por tonelaje; finos = toneladas × ley × recuperación; comerciales = 95 % de los recuperados.</p>
+    <div class="inv-table-wrap">
+      <table class="inv-table inv-bres" data-source="bud_resumen" data-row-key="concepto">
+        <thead><tr>
+          <th data-field="concepto">Concepto</th>
+          <th data-field="und">Und</th>
+          <th data-field="T1">T1 (Ene–Mar)</th>
+          <th data-field="T2">T2 (Abr–Jun)</th>
+          <th data-field="T3">T3 (Jul–Set)</th>
+          <th data-field="T4">T4 (Oct–Dic)</th>
+          <th data-field="Total">Año 2027</th>
+        </tr></thead>
+        <tbody data-draw="bud_resumen"></tbody>
+      </table>
     </div>
   </section>
 
@@ -1120,6 +1142,51 @@ dash.draw('ch_bud_oz', (el) => {
 dash.draw('ch_bud_ley', (el) => {
   const rows = budRows(el); if (!rows) return;
   invBar(el, rows, { aria: 'Ley de cabeza por mes', series: [{ f: 'ley_planta', name: 'Ley de cabeza' }], color: () => '#B09A3B', fmt: FMT.g, unit: ' g/t', tick: d3.format('.1f') });
+});
+
+dash.calc('bud_resumen', {
+  title: 'Resumen trimestral del budget',
+  description: 'Por trimestre y año: toneladas tratadas y aportes sumados, ley de cabeza ponderada por tonelaje, finos = Σ toneladas × ley × recuperación (kg y oz) y comerciales al 95 %.',
+  inputs: ['budget'],
+  fn: (budget) => {
+    const r = budget.map((d) => ({ o: +d.orden, ton: +d.ton_planta, ley: +d.ley_planta, rec: +d.recuperacion, ash: +d.aporte_shonte, aes: +d.aporte_esperanza }));
+    const per = { T1: [1, 3], T2: [4, 6], T3: [7, 9], T4: [10, 12], Total: [1, 12] };
+    const agg = (rs) => {
+      const sum = (f) => rs.reduce((s, d) => s + f(d), 0);
+      const t = sum((d) => d.ton), g = sum((d) => d.ton * d.ley * d.rec);
+      return { ton: t, ley: sum((d) => d.ton * d.ley) / t, ash: sum((d) => d.ash), aes: sum((d) => d.aes), kg: g / 1000, oz: g / 31.1035, ozc: g / 31.1035 * 0.95 };
+    };
+    const a = {};
+    Object.entries(per).forEach(([k, [i, j]]) => { a[k] = agg(r.filter((d) => d.o >= i && d.o <= j)); });
+    const row = (concepto, und, fmt, tipo, f) => {
+      const o = { concepto, und, fmt, tipo };
+      Object.keys(per).forEach((k) => { o[k] = a[k][f]; });
+      return o;
+    };
+    return [
+      row('Toneladas tratadas planta', 'TMS', 't', 'main', 'ton'),
+      row('Aporte Shonte Quelle', 'TMS', 't', '', 'ash'),
+      row('Aporte Mina Esperanza', 'TMS', 't', '', 'aes'),
+      row('Ley de cabeza', 'g/t', 'g', 'main', 'ley'),
+      row('Finos recuperados', 'kg', 'kg', '', 'kg'),
+      row('Finos recuperados', 'oz', 'int', 'main', 'oz'),
+      row('Finos comerciales', 'oz', 'int', 'main', 'ozc')
+    ].map((d, i) => ({ ...d, concepto: i === 4 ? 'Finos recuperados (kg)' : i === 5 ? 'Finos recuperados (oz)' : d.concepto }));
+  }
+});
+dash.draw('bud_resumen', (tb) => {
+  const d = dash.data('bud_resumen');
+  tb.replaceChildren();
+  if (d.status !== 'ok') return;
+  d.data.forEach((r) => {
+    const tr = document.createElement('tr');
+    if (r.tipo) tr.className = 'b-' + r.tipo;
+    const f = BUD_FMT[r.fmt];
+    [['concepto', (v) => v], ['und', (v) => v], ['T1', f], ['T2', f], ['T3', f], ['T4', f], ['Total', f]].forEach(([k, fmt]) => {
+      const td = document.createElement('td'); td.textContent = fmt(r[k]); tr.appendChild(td);
+    });
+    tb.appendChild(tr);
+  });
 });
 </script>
 
